@@ -1,0 +1,15 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="70" fill="#ECFDF5" />
+  <rect x="40" y="50" width="120" height="90" rx="10" fill="white" stroke="#E2E8F0" stroke-width="2" />
+  <path d="M40 60C40 54.4772 44.4772 50 50 50H150C155.523 50 160 54.4772 160 60V65H40V60Z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2" />
+  <circle cx="52" cy="57.5" r="3" fill="#CBD5E1" />
+  <circle cx="62" cy="57.5" r="3" fill="#CBD5E1" />
+  <circle cx="72" cy="57.5" r="3" fill="#CBD5E1" />
+  <circle cx="70" cy="100" r="8" fill="#D1FAE5" stroke="#10B981" stroke-width="2" />
+  <path d="M70 100L95 85L125 110L145 95" stroke="#10B981" stroke-width="2" stroke-dasharray="4 4" />
+  <circle cx="125" cy="110" r="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="2" />
+  <circle cx="140" cy="120" r="15" fill="white" stroke="#64748B" stroke-width="2" />
+  <path d="M150 130L165 145" stroke="#64748B" stroke-width="3" stroke-linecap="round" />
+  <rect x="50" y="125" width="30" height="4" rx="2" fill="#E2E8F0" />
+  <rect x="90" y="125" width="20" height="4" rx="2" fill="#E2E8F0" />
+</svg>

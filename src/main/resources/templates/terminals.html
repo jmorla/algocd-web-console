@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="#{terminal.title}">AlgoCD - Terminals</title>
+    <link rel="stylesheet" href="/dist/main.css" />
+  </head>
+  <body>
+    <div class="h-screen bg-[#F8FAFC] flex font-sans text-[#1E293B] overflow-hidden">
+      <!-- Sidebar (Static) -->
+      <aside th:replace="~{fragments/sidebar :: sidebar('terminal')}"></aside>
+
+      <!-- Main Content (Scrollable) -->
+      <main class="flex-1 h-full overflow-y-auto px-48 py-12">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+          <div>
+            <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{terminal.header.title}">Terminals</h1>
+            <p class="text-slate-500 text-sm" th:text="#{terminal.header.subtitle}">Manage and monitor your cloud MetaTrader instances.</p>
+          </div>
+          <a th:href="@{/terminals/new}" class="flex items-center gap-2 bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-[#1D4ED8] transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span th:text="#{terminal.header.button.deploy}">Deploy New Terminal</span>
+          </a>
+        </header>
+        
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center justify-center py-24 px-6">
+          <!-- Subtle Window with Chart Illustration -->
+          <div class="w-48 h-48 mb-8 relative flex items-center justify-center">
+            <img src="/terminals-empty.svg" th:alt="#{terminal.empty.title}" class="w-full h-full">
+          </div>
+          
+          <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center" th:text="#{terminal.empty.title}">Ready to deploy?</h2>
+          <p class="text-slate-500 max-w-xs text-center mb-8 text-sm leading-relaxed" th:text="#{terminal.empty.description}">
+            Your workspace is empty. Terminals allow you to connect your broker accounts and start executing automated trading strategies.
+          </p>
+          
+          <a th:href="@{/terminals/new}" class="flex items-center gap-2 bg-[#2563EB] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-[#1D4ED8] transition-all hover:scale-[1.02] active:scale-[0.98]">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span th:text="#{terminal.empty.button}">Deploy your first terminal</span>
+          </a>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/dist/main.js"></script>
+  </body>
+</html>

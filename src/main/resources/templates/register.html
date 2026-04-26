@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="#{register.title}">AlgoCD - Register</title>
+    <link rel="stylesheet" href="/dist/main.css" />
+  </head>
+  <body class="bg-[#F8FAFC] font-sans text-[#1E293B]">
+    <div class="min-h-screen flex flex-col items-center justify-center p-6">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 mb-10">
+        <i data-lucide="bot" class="w-10 h-10 text-[#2563EB]"></i>
+        <span class="text-3xl font-bold tracking-tight text-[#1E293B]">AlgoCD</span>
+      </div>
+
+      <!-- Register Card -->
+      <div class="w-full max-w-[480px] bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8">
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{register.card.title}">Create account</h1>
+          <p class="text-slate-500 mt-1" th:text="#{register.card.subtitle}">Join AlgoCD and start automating your trading</p>
+        </div>
+
+        <form th:action="@{/signup}" method="post" th:object="${createUserRecord}" class="space-y-5" 
+              x-data="{ 
+                password: '', 
+                confirmPassword: '',
+                get strength() {
+                  if (!this.password) return 0;
+                  let s = 0;
+                  if (this.password.length >= 8) s++;
+                  if (/[A-Z]/.test(this.password)) s++;
+                  if (/[0-9]/.test(this.password)) s++;
+                  if (/[^A-Za-z0-9]/.test(this.password)) s++;
+                  return s;
+                }
+              }">
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-700 mb-2" th:text="#{register.form.label.email}">Email address</label>
+            <input type="email" id="email" th:field="*{email}" required th:placeholder="#{register.form.placeholder.email}" 
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              th:classappend="${#fields.hasErrors('email')} ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''">
+            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-semibold text-slate-700 mb-2" th:text="#{register.form.label.password}">Password</label>
+            <input type="password" id="password" th:field="*{password}" required placeholder="••••••••" x-model="password"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              th:classappend="${#fields.hasErrors('password')} ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''">
+            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+            
+            <!-- Password Strength Meter -->
+            <div class="mt-3" x-show="password.length > 0" x-cloak>
+              <div class="flex gap-1 mb-1.5">
+                <template x-for="i in 4">
+                  <div class="h-1 flex-1 rounded-full transition-all duration-500"
+                       :class="{
+                         'bg-slate-100': strength < i,
+                         'bg-red-400': strength >= i && strength <= 1,
+                         'bg-amber-400': strength >= i && strength == 2,
+                         'bg-emerald-400': strength >= i && strength >= 3
+                       }">
+                  </div>
+                </template>
+              </div>
+              <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                <span class="text-slate-400" th:text="#{register.form.label.password.strength}">Strength</span>
+                <span :class="{
+                  'text-red-500': strength <= 1,
+                  'text-amber-500': strength == 2,
+                  'text-emerald-500': strength >= 3
+                }">
+                  <span x-show="strength <= 1" x-cloak th:text="#{register.form.strength.weak}">Weak</span>
+                  <span x-show="strength == 2" x-cloak th:text="#{register.form.strength.fair}">Fair</span>
+                  <span x-show="strength == 3" x-cloak th:text="#{register.form.strength.good}">Good</span>
+                  <span x-show="strength == 4" x-cloak th:text="#{register.form.strength.strong}">Strong</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="confirm-password" class="block text-sm font-semibold text-slate-700 mb-2" th:text="#{register.form.label.password.confirm}">Confirm Password</label>
+            <input type="password" id="confirm-password" th:field="*{confirmPassword}" required placeholder="••••••••" x-model="confirmPassword"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              th:classappend="${#fields.hasErrors('confirmPassword')} ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''">
+            <p class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
+          </div>
+
+          <div th:if="${#fields.hasAnyErrors()}" class="space-y-2">
+            <div th:each="err : ${#fields.globalErrors()}"
+                 class="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-xs font-medium flex items-center gap-2">
+              <i data-lucide="alert-circle" class="w-4 h-4"></i>
+              <span th:text="${err}">Error message</span>
+            </div>
+          </div>
+          <div x-show="password.length > 0 && confirmPassword.length > 0 && password !== confirmPassword" 
+               class="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-xs font-medium flex items-center gap-2"
+               x-cloak>
+            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+            <span th:text="#{register.form.error.password.mismatch}">Passwords do not match.</span>
+          </div>
+
+          <div>
+            <p class="text-[11px] text-slate-400 mb-1.5 leading-relaxed" 
+               th:with="serviceLink='<a href=&quot;#&quot; class=&quot;text-[#2563EB] font-medium hover:underline&quot;>' + #{register.form.terms.service} + '</a>', 
+                       privacyLink='<a href=&quot;#&quot; class=&quot;text-[#2563EB] font-medium hover:underline&quot;>' + #{register.form.terms.privacy} + '</a>'"
+               th:utext="#{register.form.terms.text(${serviceLink}, ${privacyLink})}">
+              By creating an account, you agree to our <a href="#" class="text-[#2563EB] font-medium hover:underline">Terms of Service</a> and <a href="#" class="text-[#2563EB] font-medium hover:underline">Privacy Policy</a>.
+            </p>
+          </div>
+
+          <button type="submit" 
+                  class="w-full bg-[#2563EB] text-white py-3 rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-[#1D4ED8] transition-all active:scale-[0.98] mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]" 
+                  th:text="#{register.form.button.create}"
+                  :disabled="!password || !confirmPassword || password !== confirmPassword">
+            Create account
+          </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p class="text-sm text-slate-500">
+            <span th:text="#{register.footer.hasaccount}">Already have an account?</span> 
+            <a th:href="@{/login}" class="font-bold text-[#2563EB] hover:underline" th:text="#{register.footer.signin}">Sign in</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <p class="mt-8 text-sm text-slate-400" th:text="#{common.footer.copyright}">
+        &copy; 2026 AlgoCD Platform. All rights reserved.
+      </p>
+    </div>
+    <script type="module" src="/dist/main.js"></script>
+  </body>
+</html>

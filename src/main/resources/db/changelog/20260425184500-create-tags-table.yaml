@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260425184500-create-tags-table
+      author: system
+      changes:
+        - createTable:
+            tableName: tags
+            columns:
+              - column:
+                  name: resource_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_key
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_value
+                  type: VARCHAR(256)
+        - addPrimaryKey:
+            tableName: tags
+            columnNames: resource_id, tag_key
+            constraintName: pk_tags
+        - createIndex:
+            tableName: tags
+            indexName: idx_tags_key_value
+            columns:
+              - column:
+                  name: tag_key
+              - column:
+                  name: tag_value

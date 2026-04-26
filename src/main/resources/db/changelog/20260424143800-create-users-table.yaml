@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-table
+      author: system
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints: {primaryKey: true, nullable: false}
+              - column:
+                  name: username
+                  type: VARCHAR(50)
+                  constraints: {unique: true, nullable: true }
+              - column:
+                  name: email
+                  type: VARCHAR(50)
+                  constraints: { unique: true, nullable: false }
+              - column:
+                  name: password_hash
+                  type: VARCHAR(255)
+                  constraints: {nullable: false}
+              - column:
+                  name: onboarding_completed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: account_non_expired
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: account_non_locked
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: credentials_non_expired
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP

@@ -1,0 +1,21 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Glow -->
+  <circle cx="100" cy="100" r="70" fill="#EFF6FF" />
+  
+  <!-- Window Frame -->
+  <rect x="40" y="50" width="120" height="90" rx="10" fill="white" stroke="#E2E8F0" stroke-width="2" />
+  <!-- Title Bar -->
+  <path d="M40 60C40 54.4772 44.4772 50 50 50H150C155.523 50 160 54.4772 160 60V65H40V60Z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2" />
+  <circle cx="52" cy="57.5" r="3" fill="#CBD5E1" />
+  <circle cx="62" cy="57.5" r="3" fill="#CBD5E1" />
+  <circle cx="72" cy="57.5" r="3" fill="#CBD5E1" />
+  
+  <!-- Subtle Line Chart -->
+  <path d="M55 115L75 105L95 110L115 85L135 95L145 75" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Chart Fill -->
+  <path d="M55 115L75 105L95 110L115 85L135 95L145 75V125H55V115Z" fill="#DBEAFE" fill-opacity="0.5" />
+  
+  <!-- Decorative elements -->
+  <rect x="145" y="100" width="20" height="20" rx="4" fill="#FDE047" fill-opacity="0.3" transform="rotate(15 145 100)" />
+  <circle cx="45" cy="120" r="8" fill="#F472B6" fill-opacity="0.1" />
+</svg>

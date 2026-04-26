@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/20260424143800-create-users-table.yaml
+  - include:
+      file: db/changelog/20260425184500-create-tags-table.yaml
+  - include:
+      file: db/changelog/20260425190000-create-terminals-and-locations.yaml

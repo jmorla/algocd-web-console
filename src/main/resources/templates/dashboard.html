@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="#{dashboard.title}">AlgoCD - Dashboard</title>
+    <link rel="stylesheet" href="/dist/main.css" />
+  </head>
+  <body>
+    <div class="h-screen bg-[#F8FAFC] flex font-sans text-[#1E293B] overflow-hidden">
+      <!-- Sidebar (Static) -->
+      <aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
+
+      <!-- Main Content (Scrollable) -->
+      <main class="flex-1 h-full overflow-y-auto px-48 py-12">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+          <div>
+            <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{dashboard.header.title}">Platform Overview</h1>
+            <p class="text-slate-500 text-sm" th:text="#{dashboard.header.subtitle}">Overview of your trading infrastructure performance.</p>
+          </div>
+          <a th:href="@{/terminals/new}" class="flex items-center gap-2 bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-[#1D4ED8] transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            [[#{dashboard.header.button.deploy}]]
+          </a>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group">
+            <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center mb-4 text-blue-500">
+              <i data-lucide="monitor" class="w-6 h-6"></i>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-200 absolute top-4 right-4 rotate-[-45deg]"></i>
+            <p class="text-[13px] font-semibold text-slate-500 mb-1" th:text="#{dashboard.stats.active_terminals}">Active Terminals</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-[#1E293B]">12 / 15</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1" th:text="#{dashboard.stats.active_terminals.trend(2)}">+2 this week</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group">
+            <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center mb-4 text-emerald-500">
+              <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-200 absolute top-4 right-4 rotate-[-45deg]"></i>
+            <p class="text-[13px] font-semibold text-slate-500 mb-1" th:text="#{dashboard.stats.experts_running}">Experts Running</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-[#1E293B]">300</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1" th:text="#{dashboard.stats.experts_running.context(8)}">Across 8 clusters</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group">
+            <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center mb-4 text-indigo-500">
+              <i data-lucide="database" class="w-6 h-6"></i>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-200 absolute top-4 right-4 rotate-[-45deg]"></i>
+            <p class="text-[13px] font-semibold text-slate-500 mb-1" th:text="#{dashboard.stats.repository_artifacts}">Repository Artifacts</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-[#1E293B]">1,248</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1" th:text="#{dashboard.stats.repository_artifacts.context('4.2')}">4.2 GB storage used</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group">
+            <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center mb-4 text-amber-500">
+              <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-200 absolute top-4 right-4 rotate-[-45deg]"></i>
+            <p class="text-[13px] font-semibold text-slate-500 mb-1" th:text="#{dashboard.stats.estimated_costs}">Estimated Costs</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-[#1E293B]">$142.08</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1" th:text="#{dashboard.stats.estimated_costs.forecast('$185.32')}">Forecasted: $185.32</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 mb-6 items-start">
+          <div class="col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="px-6 py-4 flex items-center justify-between">
+              <h2 class="font-bold text-[#1E293B]" th:text="#{dashboard.health.title}">Live Terminal Health</h2>
+              <button class="flex items-center gap-2 px-3 py-1.5 text-[12px] font-bold text-slate-500 hover:text-[#2563EB] hover:bg-slate-50 rounded-lg transition-all border border-slate-200">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                [[#{dashboard.health.button.refresh}]]
+              </button>
+            </div>
+            <table class="w-full text-left">
+              <thead class="bg-slate-50 border-y border-slate-100">
+                <tr>
+                  <th class="px-6 py-3 text-[12px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{dashboard.health.table.column.id}">Terminal ID</th>
+                  <th class="px-6 py-3 text-[12px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{dashboard.health.table.column.name}">Name</th>
+                  <th class="px-6 py-3 text-[12px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{dashboard.health.table.column.status}">Status</th>
+                  <th class="px-6 py-3 text-[12px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{dashboard.health.table.column.active_eas}">Active EAs</th>
+                  <th class="px-6 py-3 text-[12px] font-bold text-slate-400 uppercase tracking-wider text-right pr-12" th:text="#{dashboard.health.table.column.resource}">Resource</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <!-- (Rows remain unchanged ...) -->
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-6 py-4 text-sm font-semibold text-[#2563EB]">e961538189e4</td>
+                  <td class="px-6 py-4 text-sm text-slate-600">fundednext-50k-phase1</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-green-600 bg-green-50">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> [[#{dashboard.health.status.online}]]
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-500" th:text="#{dashboard.health.table.running('80/80')}">80/80 running</td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-end pr-6">
+                      <div class="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-12"></div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-6 py-4 text-sm font-semibold text-[#2563EB]">a2f8b1c9d3e7</td>
+                  <td class="px-6 py-4 text-sm text-slate-600">fundednext-100k-funded</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-green-600 bg-green-50">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> [[#{dashboard.health.status.online}]]
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-500" th:text="#{dashboard.health.table.running('42/50')}">42/50 running</td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-end pr-6">
+                      <div class="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-6"></div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-6 py-4 text-sm font-semibold text-[#2563EB]">d4e1a7c2b8f5</td>
+                  <td class="px-6 py-4 text-sm text-slate-600">darwinex-XYZ-portfolio</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-amber-600 bg-amber-50">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> [[#{dashboard.health.status.syncing}]]
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-500" th:text="#{dashboard.health.table.running('12/80')}">12/80 running</td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-end pr-6">
+                      <div class="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-2"></div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-6 py-4 text-sm font-semibold text-[#2563EB]">b9c5d1e8f2a3</td>
+                  <td class="px-6 py-4 text-sm text-slate-600">axi-select-1</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-green-600 bg-green-50">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> [[#{dashboard.health.status.online}]]
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-500" th:text="#{dashboard.health.table.running('60/60')}">60/60 running</td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-end pr-6">
+                      <div class="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-10"></div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-6 py-4 text-sm font-semibold text-[#2563EB]">f1e7d3b9a5c8</td>
+                  <td class="px-6 py-4 text-sm text-slate-600">demo-account-01</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-slate-500 bg-slate-100">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> [[#{dashboard.health.status.idle}]]
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-500" th:text="#{dashboard.health.table.running('0/50')}">0/50 running</td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-end pr-6">
+                      <div class="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-0"></div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Pagination Footer -->
+            <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+              <p class="text-[12px] font-medium text-slate-500" th:text="#{dashboard.health.pagination.info(5, 12)}">Showing 5 of 12 terminal</p>
+              <div class="flex items-center gap-2">
+                <button class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50" disabled>
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <div class="flex items-center gap-1">
+                  <button class="w-8 h-8 rounded-lg bg-[#2563EB] text-white text-[12px] font-bold">1</button>
+                  <button class="w-8 h-8 rounded-lg hover:bg-slate-50 text-slate-600 text-[12px] font-bold transition-all">2</button>
+                  <button class="w-8 h-8 rounded-lg hover:bg-slate-50 text-slate-600 text-[12px] font-bold transition-all">3</button>
+                </div>
+                <button class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+            <div class="flex items-center gap-2 mb-6">
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
+              <h2 class="font-bold text-[#1E293B]" th:text="#{dashboard.costs.title}">Cost per Resource</h2>
+            </div>
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="monitor" class="w-4 h-4 text-slate-400"></i>
+                    <span class="text-sm font-semibold text-slate-600" th:text="#{dashboard.stats.active_terminals}">Active Terminals</span>
+                  </div>
+                  <span class="text-sm font-bold text-[#1E293B]">$98.50</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full w-[70%]"></div>
+                </div>
+                <div class="flex justify-between mt-2">
+                   <p class="text-[11px] text-slate-400" th:text="#{dashboard.costs.current_spend}">Current spend</p>
+                   <p class="text-[11px] font-bold text-slate-500" th:text="#{dashboard.costs.estimated('$125.00')}">Est. $125.00</p>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="database" class="w-4 h-4 text-slate-400"></i>
+                    <span class="text-sm font-semibold text-slate-600" th:text="#{dashboard.costs.repository_quota}">Repository Quota</span>
+                  </div>
+                  <span class="text-sm font-bold text-[#1E293B]">$43.58</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="bg-indigo-500 h-full w-[30%]"></div>
+                </div>
+                <div class="flex justify-between mt-2">
+                   <p class="text-[11px] text-slate-400" th:text="#{dashboard.costs.current_spend}">Current spend</p>
+                   <p class="text-[11px] font-bold text-slate-500" th:text="#{dashboard.costs.estimated('$60.32')}">Est. $60.32</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/dist/main.js"></script>
+  </body>
+</html>
