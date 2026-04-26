@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,23 +29,25 @@ class PlanMapperTest {
     @DisplayName("Given plans in the database, when findAll is called, then all plans are returned")
     void givenPlans_whenFindAll_thenReturnsAllPlans() {
         // Given
-        jdbcTemplate.execute("""
+        UUID plan1Id = UUID.randomUUID();
+        UUID plan2Id = UUID.randomUUID();
+        jdbcTemplate.execute(String.format("""
             INSERT INTO plans (plan_id, name, cpu_cores, ram_gb, monthly_price, hourly_price, expert_limit)
-            VALUES ('plan1', 'Basic Plan', 1, 2, 10.00, 0.015, 5)
-            """);
-        jdbcTemplate.execute("""
+            VALUES ('%s', 'Basic Plan', 1, 2, 10.00, 0.015, 5)
+            """, plan1Id));
+        jdbcTemplate.execute(String.format("""
             INSERT INTO plans (plan_id, name, cpu_cores, ram_gb, monthly_price, hourly_price, expert_limit)
-            VALUES ('plan2', 'Pro Plan', 2, 4, 20.00, 0.030, 10)
-            """);
+            VALUES ('%s', 'Pro Plan', 2, 4, 20.00, 0.030, 10)
+            """, plan2Id));
 
         // When
         List<Plan> plans = planMapper.findAll();
 
         // Then
         assertThat(plans).hasSizeGreaterThanOrEqualTo(2);
-        assertThat(plans).extracting(Plan::getPlanId).contains("plan1", "plan2");
+        assertThat(plans).extracting(Plan::getPlanId).contains(plan1Id, plan2Id);
         
-        Plan basicPlan = plans.stream().filter(p -> p.getPlanId().equals("plan1")).findFirst().orElseThrow();
+        Plan basicPlan = plans.stream().filter(p -> p.getPlanId().equals(plan1Id)).findFirst().orElseThrow();
         assertThat(basicPlan.getName()).isEqualTo("Basic Plan");
         assertThat(basicPlan.getCpuCores()).isEqualTo(1);
         assertThat(basicPlan.getRamGb()).isEqualTo(2);

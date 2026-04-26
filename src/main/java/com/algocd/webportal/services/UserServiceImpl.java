@@ -1,5 +1,6 @@
 package com.algocd.webportal.services;
 
+import com.algocd.webportal.config.AuthenticatedUser;
 import com.algocd.webportal.entities.User;
 import com.algocd.webportal.mappers.UserMapper;
 import com.algocd.webportal.services.models.CreateUserRecord;
@@ -62,7 +63,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userMapper.findByUsernameOrEmail(identifier)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with identifier: " + identifier));
 
-        return new org.springframework.security.core.userdetails.User(
+        return new AuthenticatedUser(
+                user.getUserId(),
                 user.getUsername() != null ? user.getUsername() : user.getEmail(),
                 user.getPasswordHash(),
                 user.isEnabled(),

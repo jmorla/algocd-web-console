@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,17 +28,19 @@ class LocationMapperTest {
     @DisplayName("Given locations in the database, when findAll is called, then all locations are returned")
     void givenLocations_whenFindAll_thenReturnsAllLocations() {
         // Given
-        jdbcTemplate.execute("INSERT INTO locations (location_id, name, region, enabled) VALUES ('loc1', 'New York', 'US East', true)");
-        jdbcTemplate.execute("INSERT INTO locations (location_id, name, region, enabled) VALUES ('loc2', 'London', 'Europe', false)");
+        UUID loc1Id = UUID.randomUUID();
+        UUID loc2Id = UUID.randomUUID();
+        jdbcTemplate.execute(String.format("INSERT INTO locations (location_id, name, region, enabled) VALUES ('%s', 'New York', 'US East', true)", loc1Id));
+        jdbcTemplate.execute(String.format("INSERT INTO locations (location_id, name, region, enabled) VALUES ('%s', 'London', 'Europe', false)", loc2Id));
 
         // When
         List<Location> locations = locationMapper.findAll();
 
         // Then
         assertThat(locations).hasSizeGreaterThanOrEqualTo(2);
-        assertThat(locations).extracting(Location::getLocationId).contains("loc1", "loc2");
+        assertThat(locations).extracting(Location::getLocationId).contains(loc1Id, loc2Id);
         
-        Location loc1 = locations.stream().filter(l -> l.getLocationId().equals("loc1")).findFirst().orElseThrow();
+        Location loc1 = locations.stream().filter(l -> l.getLocationId().equals(loc1Id)).findFirst().orElseThrow();
         assertThat(loc1.getName()).isEqualTo("New York");
         assertThat(loc1.getRegion()).isEqualTo("US East");
         assertThat(loc1.isEnabled()).isTrue();

@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Location {
 
-    @NotBlank
-    @Size(max = 50)
-    private String locationId;
+    @NotNull
+    private UUID locationId;
 
     @NotBlank
     @Size(max = 100)
@@ -26,18 +26,18 @@ public class Location {
     public Location() {
     }
 
-    public Location(String locationId, String name, String region, boolean enabled) {
+    public Location(UUID locationId, String name, String region, boolean enabled) {
         this.locationId = locationId;
         this.name = name;
         this.region = region;
         this.enabled = enabled;
     }
 
-    public String getLocationId() {
+    public UUID getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(String locationId) {
+    public void setLocationId(UUID locationId) {
         this.locationId = locationId;
     }
 
@@ -81,7 +81,7 @@ public class Location {
     @Override
     public String toString() {
         return "Locations{" +
-                "locationId='" + locationId + '\'' +
+                "locationId=" + locationId +
                 ", name='" + name + '\'' +
                 ", region='" + region + '\'' +
                 ", enabled=" + enabled +

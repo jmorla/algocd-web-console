@@ -16,7 +16,7 @@ public final class Result <T> {
     }
 
     public static <T, E extends Throwable> Result<T> success(T value) {
-        return new Result<>(Objects.requireNonNull(value), null, true);
+        return new Result<>(value, null, true);
     }
 
     public static <T, E extends Throwable> Result<T> failure(E error) {

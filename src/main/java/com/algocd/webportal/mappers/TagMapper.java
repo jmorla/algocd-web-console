@@ -1,6 +1,7 @@
 package com.algocd.webportal.mappers;
 
 import com.algocd.webportal.entities.Tag;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -18,4 +19,10 @@ public interface TagMapper {
         @Result(property = "tagValue", column = "tag_value")
     })
     List<Tag> findAll();
+
+    @Insert("""
+        INSERT INTO tags (resource_id, tag_key, tag_value)
+        VALUES (#{resourceId}, #{tagKey}, #{tagValue})
+        """)
+    void insert(Tag tag);
 }

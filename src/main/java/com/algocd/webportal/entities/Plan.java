@@ -6,12 +6,12 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Plan {
 
-    @NotBlank
-    @Size(max = 20)
-    private String planId;
+    @NotNull
+    private UUID planId;
 
     @NotBlank
     @Size(max = 50)
@@ -35,7 +35,7 @@ public class Plan {
     public Plan() {
     }
 
-    public Plan(String planId, String name, int cpuCores, int ramGb, BigDecimal monthlyPrice, BigDecimal hourlyPrice, int expertLimit) {
+    public Plan(UUID planId, String name, int cpuCores, int ramGb, BigDecimal monthlyPrice, BigDecimal hourlyPrice, int expertLimit) {
         this.planId = planId;
         this.name = name;
         this.cpuCores = cpuCores;
@@ -45,11 +45,11 @@ public class Plan {
         this.expertLimit = expertLimit;
     }
 
-    public String getPlanId() {
+    public UUID getPlanId() {
         return planId;
     }
 
-    public void setPlanId(String planId) {
+    public void setPlanId(UUID planId) {
         this.planId = planId;
     }
 
@@ -117,7 +117,7 @@ public class Plan {
     @Override
     public String toString() {
         return "Plans{" +
-                "planId='" + planId + '\'' +
+                "planId=" + planId +
                 ", name='" + name + '\'' +
                 ", cpuCores=" + cpuCores +
                 ", ramGb=" + ramGb +

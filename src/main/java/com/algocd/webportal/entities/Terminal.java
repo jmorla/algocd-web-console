@@ -20,17 +20,14 @@ public class Terminal {
     @Size(max = 100)
     private String name;
 
-    @NotBlank
-    @Size(max = 10)
-    private String version;
+    @NotNull
+    private MetaTraderVersion version;
 
-    @NotBlank
-    @Size(max = 20)
-    private String planId;
+    @NotNull
+    private UUID planId;
 
-    @NotBlank
-    @Size(max = 50)
-    private String locationId;
+    @NotNull
+    private UUID locationId;
 
     @NotBlank
     @Size(max = 20)
@@ -43,7 +40,7 @@ public class Terminal {
     public Terminal() {
     }
 
-    public Terminal(UUID terminalId, UUID userId, String name, String version, String planId, String locationId, String status, Instant createdAt, Instant updatedAt) {
+    public Terminal(UUID terminalId, UUID userId, String name, MetaTraderVersion version, UUID planId, UUID locationId, String status, Instant createdAt, Instant updatedAt) {
         this.terminalId = terminalId;
         this.userId = userId;
         this.name = name;
@@ -79,27 +76,27 @@ public class Terminal {
         this.name = name;
     }
 
-    public String getVersion() {
+    public MetaTraderVersion getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(MetaTraderVersion version) {
         this.version = version;
     }
 
-    public String getPlanId() {
+    public UUID getPlanId() {
         return planId;
     }
 
-    public void setPlanId(String planId) {
+    public void setPlanId(UUID planId) {
         this.planId = planId;
     }
 
-    public String getLocationId() {
+    public UUID getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(String locationId) {
+    public void setLocationId(UUID locationId) {
         this.locationId = locationId;
     }
 
@@ -132,7 +129,7 @@ public class Terminal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Terminal terminal = (Terminal) o;
-        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && Objects.equals(name, terminal.name) && Objects.equals(version, terminal.version) && Objects.equals(planId, terminal.planId) && Objects.equals(locationId, terminal.locationId) && Objects.equals(status, terminal.status) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
+        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && Objects.equals(name, terminal.name) && version == terminal.version && Objects.equals(planId, terminal.planId) && Objects.equals(locationId, terminal.locationId) && Objects.equals(status, terminal.status) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
     }
 
     @Override
@@ -146,9 +143,9 @@ public class Terminal {
                 "terminalId=" + terminalId +
                 ", userId=" + userId +
                 ", name='" + name + '\'' +
-                ", version='" + version + '\'' +
-                ", planId='" + planId + '\'' +
-                ", locationId='" + locationId + '\'' +
+                ", version=" + version +
+                ", planId=" + planId +
+                ", locationId=" + locationId +
                 ", status='" + status + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
