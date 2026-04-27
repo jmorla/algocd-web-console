@@ -33,6 +33,9 @@ public class Terminal {
     @Size(max = 20)
     private String status;
 
+    @Size(max = 45)
+    private String instanceIp;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -40,7 +43,7 @@ public class Terminal {
     public Terminal() {
     }
 
-    public Terminal(UUID terminalId, UUID userId, String name, MetaTraderVersion version, UUID planId, UUID locationId, String status, Instant createdAt, Instant updatedAt) {
+    public Terminal(UUID terminalId, UUID userId, String name, MetaTraderVersion version, UUID planId, UUID locationId, String status, String instanceIp, Instant createdAt, Instant updatedAt) {
         this.terminalId = terminalId;
         this.userId = userId;
         this.name = name;
@@ -48,6 +51,7 @@ public class Terminal {
         this.planId = planId;
         this.locationId = locationId;
         this.status = status;
+        this.instanceIp = instanceIp;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -108,6 +112,14 @@ public class Terminal {
         this.status = status;
     }
 
+    public String getInstanceIp() {
+        return instanceIp;
+    }
+
+    public void setInstanceIp(String instanceIp) {
+        this.instanceIp = instanceIp;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -129,17 +141,17 @@ public class Terminal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Terminal terminal = (Terminal) o;
-        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && Objects.equals(name, terminal.name) && version == terminal.version && Objects.equals(planId, terminal.planId) && Objects.equals(locationId, terminal.locationId) && Objects.equals(status, terminal.status) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
+        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && Objects.equals(name, terminal.name) && version == terminal.version && Objects.equals(planId, terminal.planId) && Objects.equals(locationId, terminal.locationId) && Objects.equals(status, terminal.status) && Objects.equals(instanceIp, terminal.instanceIp) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(terminalId, userId, name, version, planId, locationId, status, createdAt, updatedAt);
+        return Objects.hash(terminalId, userId, name, version, planId, locationId, status, instanceIp, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
-        return "Terminals{" +
+        return "Terminal{" +
                 "terminalId=" + terminalId +
                 ", userId=" + userId +
                 ", name='" + name + '\'' +
@@ -147,6 +159,7 @@ public class Terminal {
                 ", planId=" + planId +
                 ", locationId=" + locationId +
                 ", status='" + status + '\'' +
+                ", instanceIp='" + instanceIp + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

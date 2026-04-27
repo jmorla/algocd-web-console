@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260426194500-add-instance-ip-to-terminals
+      author: system
+      changes:
+        - addColumn:
+            tableName: terminals
+            columns:
+              - column:
+                  name: instance_ip
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: true

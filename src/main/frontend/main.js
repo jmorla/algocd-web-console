@@ -45,11 +45,15 @@ import {
   PieChart,
   RotateCcw,
   ChevronLeft,
-  FileQuestion
-} from 'lucide'
+  FileQuestion,
+  MoreVertical,
+  Settings2,
+  Square,
+  Trash2
+  } from 'lucide'
 
-// Initialize Lucide icons
-function initIcons() {
+  // Initialize Lucide icons
+  function initIcons() {
   createIcons({
     icons: {
       LayoutDashboard, Terminal, GraduationCap, Activity, LineChart, Settings, 
@@ -66,8 +70,13 @@ function initIcons() {
       PieChart,
       RotateCcw,
       ChevronLeft,
-      FileQuestion
+      FileQuestion,
+      MoreVertical,
+      Settings2,
+      Square,
+      Trash2
       }  });
+
       }
 
 // Profile Dropdown Logic
@@ -104,3 +113,8 @@ if (document.readyState === 'loading') {
   initIcons();
   initProfileDropdown();
 }
+
+// HTMX: Re-initialize icons after content swap
+document.addEventListener('htmx:afterSwap', () => {
+  initIcons();
+});

@@ -38,3 +38,13 @@ mybatis:
   type-handlers-package: com.algocd.webportal.config
   configuration:
     map-underscore-to-camel-case: true
+
+kubernetes:
+  master-url: ${KUBERNETES_MASTER_URL:}
+  namespace: ${KUBERNETES_NAMESPACE:}
+  username: ${KUBERNETES_USERNAME:}
+  password: ${KUBERNETES_PASSWORD:}
+  token: ${KUBERNETES_TOKEN:}
+  ca-cert-data: ${KUBERNETES_CA_CERT_DATA:}
+  client-cert-data: ${KUBERNETES_CLIENT_CERT_DATA:}
+  client-key-data: ${KUBERNETES_CLIENT_KEY_DATA:}
