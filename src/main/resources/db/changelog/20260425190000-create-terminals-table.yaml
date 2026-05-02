@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260425190000-create-terminals-table
+      author: system
+      changes:
+        - createTable:
+            tableName: terminals
+            columns:
+              - column:
+                  name: terminal_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_terminal_user
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: PROVISIONING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: instance_ip
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP

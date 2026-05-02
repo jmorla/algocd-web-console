@@ -10,7 +10,6 @@ AlgoCD Webportal is a management dashboard and user interface for the AlgoCD pla
     - **Migrations:** Liquibase
     - **Security:** Spring Security (Form-based login)
     - **Communication:** gRPC Client (via Spring gRPC)
-    - **Infrastrucutre:** Kubernetes Client (fabric8)
     - **Performance:** Java Virtual Threads enabled
 - **Frontend:**
     - **Templating:** Thymeleaf (Server-side rendering)

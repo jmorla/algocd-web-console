@@ -27,31 +27,23 @@ class TerminalMapperTest {
     private JdbcTemplate jdbcTemplate;
 
     private final UUID userId = UUID.randomUUID();
-    private final UUID planId = UUID.randomUUID();
-    private final UUID locationId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         // Setup prerequisite data
         jdbcTemplate.update("INSERT INTO users (user_id, username, email, password_hash) VALUES (?, ?, ?, ?)",
                 userId, "testuser", "test@example.com", "hash");
-
-        jdbcTemplate.update("INSERT INTO plans (plan_id, name, cpu_cores, ram_gb, monthly_price, hourly_price, expert_limit) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                planId, "Pro Plan", 4, 8, 29.99, 0.05, 10);
-
-        jdbcTemplate.update("INSERT INTO locations (location_id, name, region, enabled) VALUES (?, ?, ?, ?)",
-                locationId, "New York", "us-east-1", true);
     }
 
     @Test
-    @DisplayName("Given terminals exist, when findTerminalsByUserId is called, then it returns summaries with joined data")
+    @DisplayName("Given terminals exist, when findTerminalsByUserId is called, then it returns summaries")
     void givenTerminals_whenFindTerminalsByUserId_thenReturnsSummaries() {
         // Given
         UUID terminalId = UUID.randomUUID();
         jdbcTemplate.update("""
-            INSERT INTO terminals (terminal_id, user_id, name, version, plan_id, location_id, status, instance_ip)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, terminalId, userId, "Terminal 1", "METATRADER_5", planId, locationId, "RUNNING", "192.168.1.1");
+            INSERT INTO terminals (terminal_id, user_id, name, version, status, instance_ip)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """, terminalId, userId, "Terminal 1", "METATRADER_5", "RUNNING", "192.168.1.1");
 
         // When
         List<TerminalSummary> summaries = terminalMapper.findTerminalsByUserId(userId, 10, 0);
@@ -63,14 +55,6 @@ class TerminalMapperTest {
         assertThat(summary.getName()).isEqualTo("Terminal 1");
         assertThat(summary.getVersion()).isEqualTo(MetaTraderVersion.METATRADER_5);
         assertThat(summary.getInstanceIp()).isEqualTo("192.168.1.1");
-        
-        // Verify Joins (Flat fields)
-        assertThat(summary.getPlanName()).isEqualTo("Pro Plan");
-        assertThat(summary.getCpuCores()).isEqualTo(4);
-        assertThat(summary.getRamGb()).isEqualTo(8);
-        
-        assertThat(summary.getLocationName()).isEqualTo("New York");
-        assertThat(summary.getLocationRegion()).isEqualTo("us-east-1");
     }
 
     @Test
@@ -79,9 +63,9 @@ class TerminalMapperTest {
         // Given
         for (int i = 0; i < 5; i++) {
             jdbcTemplate.update("""
-                INSERT INTO terminals (terminal_id, user_id, name, version, plan_id, location_id, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP + (? * interval '1 minute'))
-                """, UUID.randomUUID(), userId, "Terminal " + i, "METATRADER_4", planId, locationId, "RUNNING", i);
+                INSERT INTO terminals (terminal_id, user_id, name, version, status, created_at)
+                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP + (? * interval '1 minute'))
+                """, UUID.randomUUID(), userId, "Terminal " + i, "METATRADER_4", "RUNNING", i);
         }
 
         // When

@@ -1,147 +1,125 @@
 <div id="terminals-list" th:fragment="terminalsList" xmlns:th="http://www.thymeleaf.org">
-  <!-- Table View -->
-  <div th:if="${not #lists.isEmpty(terminals)}" class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
-    <table class="w-full text-left text-sm text-slate-500 border-separate border-spacing-0">
-      <thead class="bg-slate-50 text-xs uppercase text-slate-700 font-semibold">
-        <tr>
-          <th class="px-6 py-4 border-b border-slate-200 rounded-tl-xl" th:text="#{terminal.list.column.name}">Name</th>
-          <th class="px-6 py-4 border-b border-slate-200" th:text="#{terminal.list.column.public_ip}">Public IP</th>
-          <th class="px-6 py-4 border-b border-slate-200" th:text="#{terminal.list.column.location}">Location</th>
-          <th class="px-6 py-4 border-b border-slate-200" th:text="#{terminal.list.column.status}">Status</th>
-          <th class="px-6 py-4 border-b border-slate-200" th:text="#{terminal.list.column.created}">Created</th>
-          <th class="px-6 py-4 border-b border-slate-200 text-right rounded-tr-xl" th:text="#{terminal.list.column.actions}">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        <tr th:each="terminal, iterStat : ${terminals}" class="hover:bg-slate-50 transition-colors">
-          <td class="px-6 py-4" th:classappend="${iterStat.last} ? 'rounded-bl-xl' : ''">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 text-blue-500 flex items-center justify-center">
-                <i data-lucide="cpu" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-semibold text-[#1E293B]" th:text="${terminal.name}">Terminal Name</div>
-                <div class="text-xs text-slate-500">
-                  <span th:text="${#strings.capitalize(#strings.toLowerCase(terminal.version.name().replace('_', ' ')))}">Metatrader 5</span>
-                  <span class="mx-1">•</span>
-                  <span th:text="${terminal.planName + ' (' + #messages.msg('terminal.list.plan_info', terminal.cpuCores, terminal.ramGb) + ')'}">Pro Plan (4 Cores / 8 GB)</span>
-                </div>
-              </div>
+  <!-- Grid View -->
+  <div th:if="${not #lists.isEmpty(terminals)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div th:each="terminal : ${terminals}" 
+         class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group flex flex-col">
+      
+      <!-- Card Header -->
+      <div class="p-5 border-b border-slate-50 flex items-start justify-between">
+        <div class="flex items-center gap-4">
+          <!-- Instance Icon -->
+          <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 text-blue-600 flex items-center justify-center shadow-sm">
+            <i data-lucide="monitor" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-[#1E293B] text-lg leading-tight group-hover:text-blue-600 transition-colors" th:text="${terminal.name}">Terminal Name</h3>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                      th:classappend="${terminal.status == 'RUNNING' ? 'bg-green-400' : (terminal.status == 'PROVISIONING' ? 'bg-blue-400' : 'bg-slate-400')}"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2"
+                      th:classappend="${terminal.status == 'RUNNING' ? 'bg-green-500' : (terminal.status == 'PROVISIONING' ? 'bg-blue-500' : 'bg-slate-500')}"></span>
+              </span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500" 
+                    th:text="${#messages.msg('terminal.status.' + terminal.status)}">RUNNING</span>
             </div>
-          </td>
-          <td class="px-6 py-4">
-            <div class="text-[#1E293B] font-mono text-xs" th:text="${terminal.instanceIp != null ? terminal.instanceIp : '--'}">192.168.1.1</div>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-2">
-              <span th:text="${terminal.locationRegion}">us-east-1</span>
-            </div>
-          </td>
-          <td class="px-6 py-4">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
-                  th:classappend="${terminal.status == 'RUNNING' ? 'text-green-600 bg-green-50' : 
-                                   (terminal.status == 'PROVISIONING' ? 'text-blue-600 bg-blue-50' : 
-                                   (terminal.status == 'STOPPED' ? 'text-amber-600 bg-amber-50' : 
-                                   (terminal.status == 'FAILED' ? 'text-rose-600 bg-rose-50' : 'text-slate-500 bg-slate-100')))}">
-              <span class="w-1.5 h-1.5 rounded-full"
-                    th:classappend="${terminal.status == 'RUNNING' ? 'bg-green-500' : 
-                                     (terminal.status == 'PROVISIONING' ? 'bg-blue-500' : 
-                                     (terminal.status == 'STOPPED' ? 'bg-amber-500' : 
-                                     (terminal.status == 'FAILED' ? 'bg-rose-500' : 'bg-slate-400')))}"></span>
-              <span th:text="${#messages.msg('terminal.status.' + terminal.status)}">RUNNING</span>
-            </span>
-          </td>
-          <td class="px-6 py-4 text-xs" th:text="${#temporals.format(terminal.createdAt, 'dd MMM yyyy')}">
-            12 Jan 2026
-          </td>
-          <td class="px-6 py-4 text-right" th:classappend="${iterStat.last} ? 'rounded-br-xl' : ''">
-            <div x-data="{ open: false }" class="relative inline-block text-left">
-              <button @click="open = !open" @click.away="open = false" 
-                      class="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-400 hover:text-[#2563EB] hover:bg-slate-50 transition-all">
-                <i data-lucide="more-vertical" class="w-4 h-4"></i>
-              </button>
-
-              <div x-show="open" 
-                   x-transition:enter="transition ease-out duration-100"
-                   x-transition:enter-start="transform opacity-0 scale-95"
-                   x-transition:enter-end="transform opacity-100 scale-100"
-                   style="display: none;"
-                   class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none border border-slate-100 overflow-hidden">
-                <div class="py-1 text-left">
-                  <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                    <i data-lucide="settings-2" class="w-4 h-4 text-slate-400"></i> <span th:text="#{terminal.list.action.manage}">Manage</span>
-                  </a>
-                  <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                    <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-400"></i> <span th:text="#{terminal.list.action.reboot}">Reboot</span>
-                  </a>
-                  <div class="border-t border-slate-100 my-1"></div>
-                  <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50 transition-colors">
-                    <i data-lucide="square" class="w-4 h-4"></i> <span th:text="#{terminal.list.action.stop}">Stop</span>
-                  </a>
-                  <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-semibold">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i> <span th:text="#{terminal.list.action.terminate}">Terminate</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Pagination Footer -->
-    <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-white rounded-b-xl" th:if="${totalPages > 0}">
-      <p class="text-[12px] font-medium text-slate-500" th:text="#{dashboard.health.pagination.info(${#lists.size(terminals)}, ${totalTerminals})}">
-        Showing 5 of 12 terminal
-      </p>
-      <div class="flex items-center gap-2">
-        <a href="javascript:void(0)"
-           th:attr="hx-get=@{/terminals/list(page=${currentPage - 1}, size=${pageSize})}" 
-           hx-target="#terminals-list"
-           hx-swap="outerHTML"
-           class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all"
-           th:classappend="${currentPage == 1} ? 'opacity-50 pointer-events-none' : ''">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-        </a>
-        <div class="flex items-center gap-1">
-          <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-             href="javascript:void(0)"
-             th:attr="hx-get=@{/terminals/list(page=${pageNum}, size=${pageSize})}"
-             hx-target="#terminals-list"
-             hx-swap="outerHTML"
-             th:text="${pageNum}"
-             class="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold transition-all"
-             th:classappend="${pageNum == currentPage} ? 'bg-[#2563EB] text-white' : 'hover:bg-slate-50 text-slate-600'">
-            1
-          </a>
+          </div>
         </div>
-        <a href="javascript:void(0)"
-           th:attr="hx-get=@{/terminals/list(page=${currentPage + 1}, size=${pageSize})}"
-           hx-target="#terminals-list"
-           hx-swap="outerHTML"
-           class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all"
-           th:classappend="${currentPage >= totalPages} ? 'opacity-50 pointer-events-none' : ''">
-          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+
+        <!-- Action Menu -->
+        <div x-data="{ open: false }" class="relative">
+          <button @click="open = !open" @click.away="open = false" 
+                  class="p-2 rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors">
+            <i data-lucide="more-vertical" class="w-5 h-5"></i>
+          </button>
+          <div x-show="open" x-cloak
+               x-transition:enter="transition ease-out duration-100"
+               x-transition:enter-start="transform opacity-0 scale-95"
+               x-transition:enter-end="transform opacity-100 scale-100"
+               class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 border border-slate-100 overflow-hidden">
+            <div class="py-1">
+              <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                <i data-lucide="settings-2" class="w-4 h-4 text-slate-400"></i> Manage
+              </a>
+              <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-400"></i> Reboot
+              </a>
+              <div class="border-t border-slate-100 my-1"></div>
+              <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50">
+                <i data-lucide="square" class="w-4 h-4"></i> Stop
+              </a>
+              <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-semibold">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Terminate
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="p-5 space-y-4 flex-1">
+        <!-- Details Grid -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">Public IP</p>
+            <div class="flex items-center gap-1.5">
+              <code class="text-sm font-mono text-[#1E293B]" th:text="${terminal.instanceIp != null ? terminal.instanceIp : '--'}">192.168.1.1</code>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">Version</p>
+            <p class="text-sm text-[#1E293B] font-medium" th:text="${#strings.capitalize(#strings.toLowerCase(terminal.version.name().replace('_', ' ')))}">Metatrader 5</p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-500">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span th:text="${#temporals.format(terminal.createdAt, 'dd MMM yyyy')}">12 Jan 2026</span>
+          </div>
+          <div class="font-mono text-[10px] text-slate-300" th:text="${#strings.substring(terminal.terminalId, 0, 8)}">UUID</div>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="px-5 py-4 bg-slate-50/50 rounded-b-xl border-t border-slate-50">
+        <a href="#" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+          <i data-lucide="external-link" class="w-4 h-4"></i>
+          Open Console
         </a>
       </div>
     </div>
   </div>
 
+  <!-- Pagination (Lightsail Style) -->
+  <div th:if="${totalPages > 1}" class="mt-8 flex items-center justify-center gap-4">
+    <button hx-get th:attr="hx-get=@{/terminals/list(page=${currentPage - 1}, size=${pageSize})}"
+            hx-target="#terminals-list"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-white transition-all disabled:opacity-50"
+            th:disabled="${currentPage == 1}">
+      <i data-lucide="chevron-left" class="w-4 h-4"></i> Previous
+    </button>
+    
+    <span class="text-sm font-bold text-slate-500">
+      Page <span class="text-[#1E293B]" th:text="${currentPage}">1</span> of <span th:text="${totalPages}">10</span>
+    </span>
+
+    <button hx-get th:attr="hx-get=@{/terminals/list(page=${currentPage + 1}, size=${pageSize})}"
+            hx-target="#terminals-list"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-white transition-all disabled:opacity-50"
+            th:disabled="${currentPage >= totalPages}">
+      Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </button>
+  </div>
+
   <!-- Empty State -->
-  <div th:if="${#lists.isEmpty(terminals)}" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center justify-center py-24 px-6">
-    <!-- Subtle Window with Chart Illustration -->
+  <div th:if="${#lists.isEmpty(terminals)}" class="flex flex-col items-center justify-center py-20 px-6">
     <div class="w-48 h-48 mb-8 relative flex items-center justify-center">
-      <img src="/terminals-empty.svg" th:alt="#{terminal.empty.title}" class="w-full h-full">
+      <img src="/terminals-empty.svg" th:alt="#{terminal.empty.title}" class="w-full h-full opacity-50">
     </div>
-    
-    <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center" th:text="#{terminal.empty.title}">Ready to deploy?</h2>
-    <p class="text-slate-500 max-w-xs text-center mb-8 text-sm leading-relaxed" th:text="#{terminal.empty.description}">
-      Your workspace is empty. Terminals allow you to connect your broker accounts and start executing automated trading strategies.
+    <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center" th:text="#{terminal.empty.title}">No terminals found</h2>
+    <p class="text-slate-500 max-w-xs text-center text-sm leading-relaxed" th:text="#{terminal.empty.description}">
+      Register your first terminal using the AlgoCD Agent to see it here.
     </p>
-    
-    <a th:href="@{/terminals/new}" class="flex items-center gap-2 bg-[#2563EB] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-[#1D4ED8] transition-all hover:scale-[1.02] active:scale-[0.98]">
-      <i data-lucide="plus" class="w-4 h-4"></i>
-      <span th:text="#{terminal.empty.button}">Deploy your first terminal</span>
-    </a>
   </div>
 </div>

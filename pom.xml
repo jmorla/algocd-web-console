@@ -31,7 +31,6 @@
 		<grpc.version>1.77.1</grpc.version>
 		<protobuf-java.version>4.33.4</protobuf-java.version>
 		<spring-grpc.version>1.0.3</spring-grpc.version>
-		<kubernetes-client.version>7.6.1</kubernetes-client.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,13 +80,12 @@
 			<artifactId>spring-grpc-client-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+			<groupId>org.springframework.grpc</groupId>
+			<artifactId>spring-grpc-server-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.fabric8</groupId>
-			<artifactId>kubernetes-client</artifactId>
-			<version>${kubernetes-client.version}</version>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
 
 		<dependency>
@@ -182,30 +180,30 @@
 
 	<build>
 		<plugins>
-<!--			<plugin>-->
-<!--				<groupId>io.github.ascopes</groupId>-->
-<!--				<artifactId>protobuf-maven-plugin</artifactId>-->
-<!--				<version>4.0.3</version>-->
-<!--				<configuration>-->
-<!--					<protoc>${protobuf-java.version}</protoc>-->
-<!--					<binaryMavenPlugins>-->
-<!--						<binaryMavenPlugin>-->
-<!--							<groupId>io.grpc</groupId>-->
-<!--							<artifactId>protoc-gen-grpc-java</artifactId>-->
-<!--							<version>${grpc.version}</version>-->
-<!--							<options>@generated=omit</options>-->
-<!--						</binaryMavenPlugin>-->
-<!--					</binaryMavenPlugins>-->
-<!--				</configuration>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>generate</id>-->
-<!--						<goals>-->
-<!--							<goal>generate</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>io.github.ascopes</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>4.0.3</version>
+				<configuration>
+					<protoc>${protobuf-java.version}</protoc>
+					<binaryMavenPlugins>
+						<binaryMavenPlugin>
+							<groupId>io.grpc</groupId>
+							<artifactId>protoc-gen-grpc-java</artifactId>
+							<version>${grpc.version}</version>
+							<options>@generated=omit</options>
+						</binaryMavenPlugin>
+					</binaryMavenPlugins>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
