@@ -1,6 +1,6 @@
 package com.algocd.webportal.entities;
 
-public enum MetaTraderVersion {
+public enum Platform {
     METATRADER_4,
     METATRADER_5
 }

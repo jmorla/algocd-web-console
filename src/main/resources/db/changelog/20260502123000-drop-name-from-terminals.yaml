@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260502123000-drop-name-from-terminals
+      author: system
+      changes:
+        - dropColumn:
+            tableName: terminals
+            columnName: name

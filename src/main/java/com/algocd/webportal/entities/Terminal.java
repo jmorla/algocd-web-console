@@ -16,19 +16,15 @@ public class Terminal {
     @NotNull
     private UUID userId;
 
-    @NotBlank
-    @Size(max = 100)
-    private String name;
-
     @NotNull
-    private MetaTraderVersion version;
-
-    @NotBlank
-    @Size(max = 20)
-    private String status;
+    private TerminalStatus status;
 
     @Size(max = 45)
     private String instanceIp;
+
+    private String bootstrapToken;
+
+    private Instant bootstrapTokenExpiresAt;
 
     private Instant createdAt;
 
@@ -37,13 +33,13 @@ public class Terminal {
     public Terminal() {
     }
 
-    public Terminal(UUID terminalId, UUID userId, String name, MetaTraderVersion version, String status, String instanceIp, Instant createdAt, Instant updatedAt) {
+    public Terminal(UUID terminalId, UUID userId, TerminalStatus status, String instanceIp, String bootstrapToken, Instant bootstrapTokenExpiresAt, Instant createdAt, Instant updatedAt) {
         this.terminalId = terminalId;
         this.userId = userId;
-        this.name = name;
-        this.version = version;
         this.status = status;
         this.instanceIp = instanceIp;
+        this.bootstrapToken = bootstrapToken;
+        this.bootstrapTokenExpiresAt = bootstrapTokenExpiresAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -64,27 +60,11 @@ public class Terminal {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MetaTraderVersion getVersion() {
-        return version;
-    }
-
-    public void setVersion(MetaTraderVersion version) {
-        this.version = version;
-    }
-
-    public String getStatus() {
+    public TerminalStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TerminalStatus status) {
         this.status = status;
     }
 
@@ -94,6 +74,22 @@ public class Terminal {
 
     public void setInstanceIp(String instanceIp) {
         this.instanceIp = instanceIp;
+    }
+
+    public String getBootstrapToken() {
+        return bootstrapToken;
+    }
+
+    public void setBootstrapToken(String bootstrapToken) {
+        this.bootstrapToken = bootstrapToken;
+    }
+
+    public Instant getBootstrapTokenExpiresAt() {
+        return bootstrapTokenExpiresAt;
+    }
+
+    public void setBootstrapTokenExpiresAt(Instant bootstrapTokenExpiresAt) {
+        this.bootstrapTokenExpiresAt = bootstrapTokenExpiresAt;
     }
 
     public Instant getCreatedAt() {
@@ -117,12 +113,12 @@ public class Terminal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Terminal terminal = (Terminal) o;
-        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && Objects.equals(name, terminal.name) && version == terminal.version && Objects.equals(status, terminal.status) && Objects.equals(instanceIp, terminal.instanceIp) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
+        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && status == terminal.status && Objects.equals(instanceIp, terminal.instanceIp) && Objects.equals(bootstrapToken, terminal.bootstrapToken) && Objects.equals(bootstrapTokenExpiresAt, terminal.bootstrapTokenExpiresAt) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(terminalId, userId, name, version, status, instanceIp, createdAt, updatedAt);
+        return Objects.hash(terminalId, userId, status, instanceIp, bootstrapToken, bootstrapTokenExpiresAt, createdAt, updatedAt);
     }
 
     @Override
@@ -130,10 +126,10 @@ public class Terminal {
         return "Terminal{" +
                 "terminalId=" + terminalId +
                 ", userId=" + userId +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", instanceIp='" + instanceIp + '\'' +
+                ", bootstrapToken='" + bootstrapToken + '\'' +
+                ", bootstrapTokenExpiresAt=" + bootstrapTokenExpiresAt +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

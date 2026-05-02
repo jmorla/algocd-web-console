@@ -5,9 +5,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="#{terminal.title}">AlgoCD - Terminals</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" href="/dist/main.css" />
   </head>
-  <body>
+  <body x-data="{ open: false }">
     <div class="h-screen bg-[#F8FAFC] flex font-sans text-[#1E293B] overflow-hidden">
       <!-- Sidebar (Static) -->
       <aside th:replace="~{fragments/sidebar :: sidebar('terminal')}"></aside>
@@ -20,12 +22,49 @@
             <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{terminal.header.title}">Terminals</h1>
             <p class="text-slate-500 text-sm" th:text="#{terminal.header.subtitle}">Manage and monitor your cloud MetaTrader instances.</p>
           </div>
+          <button @click="open = true" hx-get="/terminals/create" hx-target="#modal-content"
+                  class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span th:text="#{terminal.button.create}">Create Terminal</span>
+          </button>
         </header>
 
         <!-- Terminals List (Fragment) -->
         <div id="terminals-list" th:replace="~{fragments/terminals-list :: terminalsList}"></div>
       </main>
     </div>
+
+    <!-- Modal Backdrop -->
+    <div x-show="open" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4">
+      
+      <!-- Modal Content -->
+      <div @click.away="open = false" 
+           x-show="open"
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="opacity-0 scale-95"
+           x-transition:enter-end="opacity-100 scale-100"
+           x-transition:leave="transition ease-in duration-200"
+           x-transition:leave-start="opacity-100 scale-100"
+           x-transition:leave-end="opacity-0 scale-95"
+           class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div id="modal-content">
+          <!-- HTMX will load the form here -->
+          <div class="p-12 text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="/dist/main.js"></script>
   </body>
 </html>

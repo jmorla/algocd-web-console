@@ -26,11 +26,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: version
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-              - column:
                   name: status
                   type: VARCHAR(20)
                   defaultValue: PROVISIONING

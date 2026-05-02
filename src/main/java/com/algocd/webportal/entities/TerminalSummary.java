@@ -7,8 +7,8 @@ import java.util.UUID;
 public class TerminalSummary {
     private UUID terminalId;
     private String name;
-    private MetaTraderVersion version;
-    private String status;
+    private Platform platform;
+    private TerminalStatus status;
     private String instanceIp;
     private Instant createdAt;
     private Instant updatedAt;
@@ -32,19 +32,19 @@ public class TerminalSummary {
         this.name = name;
     }
 
-    public MetaTraderVersion getVersion() {
-        return version;
+    public Platform getPlatform() {
+        return platform;
     }
 
-    public void setVersion(MetaTraderVersion version) {
-        this.version = version;
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
     }
 
-    public String getStatus() {
+    public TerminalStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TerminalStatus status) {
         this.status = status;
     }
 
@@ -77,12 +77,12 @@ public class TerminalSummary {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TerminalSummary that = (TerminalSummary) o;
-        return Objects.equals(terminalId, that.terminalId) && Objects.equals(name, that.name) && version == that.version && Objects.equals(status, that.status) && Objects.equals(instanceIp, that.instanceIp) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return Objects.equals(terminalId, that.terminalId) && Objects.equals(name, that.name) && platform == that.platform && status == that.status && Objects.equals(instanceIp, that.instanceIp) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(terminalId, name, version, status, instanceIp, createdAt, updatedAt);
+        return Objects.hash(terminalId, name, platform, status, instanceIp, createdAt, updatedAt);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class TerminalSummary {
         return "TerminalSummary{" +
                 "terminalId=" + terminalId +
                 ", name='" + name + '\'' +
-                ", version=" + version +
-                ", status='" + status + '\'' +
+                ", platform=" + platform +
+                ", status=" + status +
                 ", instanceIp='" + instanceIp + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

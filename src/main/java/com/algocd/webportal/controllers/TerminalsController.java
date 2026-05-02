@@ -1,16 +1,21 @@
 package com.algocd.webportal.controllers;
 
 import com.algocd.webportal.config.AuthenticatedUser;
+import com.algocd.webportal.entities.Platform;
+import com.algocd.webportal.entities.Terminal;
 import com.algocd.webportal.entities.TerminalSummary;
 import com.algocd.webportal.mappers.TerminalMapper;
+import com.algocd.webportal.services.TerminalService;
+import com.algocd.webportal.services.models.CreateTerminalRequest;
+import com.algocd.webportal.util.Result;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -18,9 +23,11 @@ import java.util.List;
 public class TerminalsController {
 
     private final TerminalMapper terminalMapper;
+    private final TerminalService terminalService;
 
-    public TerminalsController(TerminalMapper terminalMapper) {
+    public TerminalsController(TerminalMapper terminalMapper, TerminalService terminalService) {
         this.terminalMapper = terminalMapper;
+        this.terminalService = terminalService;
     }
 
     @GetMapping
@@ -39,6 +46,35 @@ public class TerminalsController {
             Model model) {
         populateTerminalsModel(user, page, size, model);
         return "fragments/terminals-list :: terminalsList";
+    }
+
+    @GetMapping("/create")
+    public String createForm(Model model) {
+        model.addAttribute("platforms", Platform.values());
+        model.addAttribute("createTerminalRequest", new CreateTerminalRequest("", null, new HashMap<>()));
+        return "fragments/terminal-create-modal :: terminalCreateForm";
+    }
+
+    @PostMapping
+    public String createTerminal(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @Valid @ModelAttribute("createTerminalRequest") CreateTerminalRequest request,
+            BindingResult bindingResult,
+            Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("platforms", Platform.values());
+            return "fragments/terminal-create-modal :: terminalCreateForm";
+        }
+
+        Result<Terminal> result = terminalService.createTerminal(user.getUserId(), request);
+        if (result.isSuccess()) {
+            model.addAttribute("terminal", result.getValue());
+            return "fragments/terminal-create-modal :: terminalTokenView";
+        } else {
+            model.addAttribute("error", result.getError().getMessage());
+            model.addAttribute("platforms", Platform.values());
+            return "fragments/terminal-create-modal :: terminalCreateForm";
+        }
     }
 
     private void populateTerminalsModel(AuthenticatedUser user, int page, int size, Model model) {

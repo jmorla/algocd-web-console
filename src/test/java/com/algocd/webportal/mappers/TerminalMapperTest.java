@@ -1,7 +1,7 @@
 package com.algocd.webportal.mappers;
 
 import com.algocd.webportal.TestcontainersConfiguration;
-import com.algocd.webportal.entities.MetaTraderVersion;
+import com.algocd.webportal.entities.Platform;
 import com.algocd.webportal.entities.TerminalSummary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,9 +41,19 @@ class TerminalMapperTest {
         // Given
         UUID terminalId = UUID.randomUUID();
         jdbcTemplate.update("""
-            INSERT INTO terminals (terminal_id, user_id, name, version, status, instance_ip)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """, terminalId, userId, "Terminal 1", "METATRADER_5", "RUNNING", "192.168.1.1");
+            INSERT INTO terminals (terminal_id, user_id, status, instance_ip)
+            VALUES (?, ?, ?, ?)
+            """, terminalId, userId, "CONNECTED", "192.168.1.1");
+        
+        jdbcTemplate.update("""
+            INSERT INTO tags (resource_id, tag_key, tag_value)
+            VALUES (?, ?, ?)
+            """, terminalId.toString(), "name", "Terminal 1");
+
+        jdbcTemplate.update("""
+            INSERT INTO tags (resource_id, tag_key, tag_value)
+            VALUES (?, ?, ?)
+            """, terminalId.toString(), "platform", "METATRADER_5");
 
         // When
         List<TerminalSummary> summaries = terminalMapper.findTerminalsByUserId(userId, 10, 0);
@@ -53,7 +63,7 @@ class TerminalMapperTest {
         TerminalSummary summary = summaries.get(0);
         assertThat(summary.getTerminalId()).isEqualTo(terminalId);
         assertThat(summary.getName()).isEqualTo("Terminal 1");
-        assertThat(summary.getVersion()).isEqualTo(MetaTraderVersion.METATRADER_5);
+        assertThat(summary.getPlatform()).isEqualTo(Platform.METATRADER_5);
         assertThat(summary.getInstanceIp()).isEqualTo("192.168.1.1");
     }
 
@@ -62,10 +72,21 @@ class TerminalMapperTest {
     void givenMultipleTerminals_whenFindWithPagination_thenRespectsLimitAndOffset() {
         // Given
         for (int i = 0; i < 5; i++) {
+            UUID terminalId = UUID.randomUUID();
             jdbcTemplate.update("""
-                INSERT INTO terminals (terminal_id, user_id, name, version, status, created_at)
-                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP + (? * interval '1 minute'))
-                """, UUID.randomUUID(), userId, "Terminal " + i, "METATRADER_4", "RUNNING", i);
+                INSERT INTO terminals (terminal_id, user_id, status, created_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP + (? * interval '1 minute'))
+                """, terminalId, userId, "CONNECTED", i);
+            
+            jdbcTemplate.update("""
+                INSERT INTO tags (resource_id, tag_key, tag_value)
+                VALUES (?, ?, ?)
+                """, terminalId.toString(), "name", "Terminal " + i);
+
+            jdbcTemplate.update("""
+                INSERT INTO tags (resource_id, tag_key, tag_value)
+                VALUES (?, ?, ?)
+                """, terminalId.toString(), "platform", "METATRADER_4");
         }
 
         // When

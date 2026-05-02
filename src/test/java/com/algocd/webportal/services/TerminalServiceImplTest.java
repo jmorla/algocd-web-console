@@ -1,13 +1,30 @@
 package com.algocd.webportal.services;
 
+import com.algocd.webportal.entities.Platform;
+import com.algocd.webportal.entities.Tag;
+import com.algocd.webportal.entities.Terminal;
 import com.algocd.webportal.mappers.TagMapper;
 import com.algocd.webportal.mappers.TerminalMapper;
+import com.algocd.webportal.services.models.CreateTerminalRequest;
+import com.algocd.webportal.util.Result;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class TerminalServiceImplTest {
@@ -24,5 +41,32 @@ class TerminalServiceImplTest {
     void setUp() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         terminalService = new TerminalServiceImpl(terminalMapper, tagMapper, validator);
+    }
+
+    @Test
+    @DisplayName("When createTerminal is called, then terminal and tags (name, platform) are inserted")
+    void whenCreateTerminal_thenInsertsTerminalAndTags() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        CreateTerminalRequest request = new CreateTerminalRequest("My Terminal", Platform.METATRADER_5, Map.of("key1", "value1"));
+
+        // When
+        Result<Terminal> result = terminalService.createTerminal(userId, request);
+
+        // Then
+        assertThat(result.isSuccess()).isTrue();
+        Terminal terminal = result.getValue();
+        assertThat(terminal.getUserId()).isEqualTo(userId);
+
+        verify(terminalMapper).insert(any(Terminal.class));
+
+        ArgumentCaptor<Tag> tagCaptor = ArgumentCaptor.forClass(Tag.class);
+        verify(tagMapper, times(3)).insert(tagCaptor.capture());
+
+        List<Tag> capturedTags = tagCaptor.getAllValues();
+        assertThat(capturedTags).extracting(Tag::getTagKey).containsExactlyInAnyOrder("name", "platform", "key1");
+        assertThat(capturedTags).filteredOn(t -> t.getTagKey().equals("name")).extracting(Tag::getTagValue).containsExactly("My Terminal");
+        assertThat(capturedTags).filteredOn(t -> t.getTagKey().equals("platform")).extracting(Tag::getTagValue).containsExactly("METATRADER_5");
+        assertThat(capturedTags).filteredOn(t -> t.getTagKey().equals("key1")).extracting(Tag::getTagValue).containsExactly("value1");
     }
 }

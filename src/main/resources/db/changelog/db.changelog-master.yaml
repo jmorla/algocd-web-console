@@ -5,3 +5,7 @@ databaseChangeLog:
       file: db/changelog/20260425184500-create-tags-table.yaml
   - include:
       file: db/changelog/20260425190000-create-terminals-table.yaml
+  - include:
+      file: db/changelog/20260502120000-add-bootstrap-token-to-terminals.yaml
+  - include:
+      file: db/changelog/20260502123000-drop-name-from-terminals.yaml

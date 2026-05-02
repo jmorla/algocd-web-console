@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260502120000-add-bootstrap-token-to-terminals
+      author: system
+      changes:
+        - addColumn:
+            tableName: terminals
+            columns:
+              - column:
+                  name: bootstrap_token
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: bootstrap_token_expires_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
