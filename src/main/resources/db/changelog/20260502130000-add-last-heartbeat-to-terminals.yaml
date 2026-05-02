@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260502130000-add-last-heartbeat-to-terminals
+      author: system
+      changes:
+        - addColumn:
+            tableName: terminals
+            columns:
+              - column:
+                  name: last_heartbeat_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

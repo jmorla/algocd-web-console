@@ -57,8 +57,31 @@ public interface TerminalMapper {
         """)
     void updateStatusWithIp(@Param("terminalId") UUID terminalId, @Param("status") com.algocd.webportal.entities.TerminalStatus status, @Param("instanceIp") String instanceIp, @Param("updatedAt") java.time.Instant updatedAt);
 
+    @Update("""
+        UPDATE terminals
+        SET last_heartbeat_at = #{heartbeatAt},
+            status = #{status},
+            updated_at = #{heartbeatAt}
+        WHERE terminal_id = #{terminalId, jdbcType=OTHER}
+        """)
+    void updateHeartbeat(@Param("terminalId") UUID terminalId, @Param("status") com.algocd.webportal.entities.TerminalStatus status, @Param("heartbeatAt") java.time.Instant heartbeatAt);
+
+    @Update("""
+        UPDATE terminals
+        SET status = #{newStatus},
+            updated_at = #{now}
+        WHERE status = #{oldStatus}
+          AND COALESCE(last_heartbeat_at, updated_at) < #{cutoffTime}
+        """)
+    int updateStatusForStaleHeartbeats(
+        @Param("oldStatus") com.algocd.webportal.entities.TerminalStatus oldStatus,
+        @Param("newStatus") com.algocd.webportal.entities.TerminalStatus newStatus,
+        @Param("cutoffTime") java.time.Instant cutoffTime,
+        @Param("now") java.time.Instant now
+    );
+
     @Select("""
-        SELECT terminal_id, user_id, status, instance_ip, bootstrap_token, bootstrap_token_expires_at, created_at, updated_at
+        SELECT terminal_id, user_id, status, instance_ip, bootstrap_token, bootstrap_token_expires_at, last_heartbeat_at, created_at, updated_at
         FROM terminals
         WHERE bootstrap_token = #{bootstrapToken}
         """)
@@ -79,4 +102,23 @@ public interface TerminalMapper {
         @Param("instanceIp") String instanceIp,
         @Param("updatedAt") java.time.Instant updatedAt
     );
+
+    @Select({
+        "<script>",
+        "SELECT terminal_id, status FROM terminals WHERE terminal_id IN ",
+        "<foreach item='item' collection='ids' open='(' separator=',' close=')'>",
+        "#{item, jdbcType=OTHER}",
+        "</foreach>",
+        "</script>"
+    })
+    List<TerminalSummary> findStatusesByIds(@Param("ids") List<java.util.UUID> ids);
+
+    @Select("""
+        SELECT terminal_id, status 
+        FROM terminals 
+        WHERE user_id = #{userId, jdbcType=OTHER}
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+        """)
+    List<TerminalSummary> findStatusesByUserId(@Param("userId") java.util.UUID userId, @Param("limit") int limit, @Param("offset") int offset);
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -55,6 +56,7 @@ public class TerminalServiceImpl implements TerminalService {
                 null,
                 token,
                 expiresAt,
+                null,
                 now,
                 now
         );
@@ -101,5 +103,21 @@ public class TerminalServiceImpl implements TerminalService {
         terminal.setUpdatedAt(now);
         
         return Result.success(terminal);
+    }
+
+    @Override
+    @Transactional
+    public Result<Void> heartbeat(UUID terminalId) {
+        Instant now = Instant.now();
+        terminalMapper.updateHeartbeat(terminalId, TerminalStatus.CONNECTED, now);
+        return Result.success(null);
+    }
+
+    @Override
+    @Transactional
+    public int markStaleTerminalsAsDisconnected(Duration ttl) {
+        Instant now = Instant.now();
+        Instant cutoffTime = now.minus(ttl);
+        return terminalMapper.updateStatusForStaleHeartbeats(TerminalStatus.CONNECTED, TerminalStatus.DISCONNECTED, cutoffTime, now);
     }
 }

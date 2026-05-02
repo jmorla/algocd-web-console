@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface TerminalService {
     Result<Terminal> createTerminal(UUID userId, CreateTerminalRequest request);
     Result<Terminal> bootstrapTerminal(String bootstrapToken, String instanceIp);
+    Result<Void> heartbeat(UUID terminalId);
+    int markStaleTerminalsAsDisconnected(java.time.Duration ttl);
 }

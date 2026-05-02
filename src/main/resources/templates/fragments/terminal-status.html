@@ -1,0 +1,29 @@
+<!-- Fragment for the inner content of the status indicator -->
+<th:block th:fragment="indicator-content" xmlns:th="http://www.thymeleaf.org">
+  <span class="relative flex h-2 w-2">
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+          th:classappend="${terminal.status != null && terminal.status.name() == 'CONNECTED' ? 'bg-green-400' : (terminal.status != null && terminal.status.name() == 'ERROR' ? 'bg-red-400' : 'bg-slate-400')}"></span>
+    <span class="relative inline-flex rounded-full h-2 w-2"
+          th:classappend="${terminal.status != null && terminal.status.name() == 'CONNECTED' ? 'bg-green-500' : (terminal.status != null && terminal.status.name() == 'ERROR' ? 'bg-red-500' : 'bg-slate-500')}"></span>
+  </span>
+  <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500" 
+        th:text="${terminal.status != null ? #messages.msg('terminal.status.' + terminal.status) : 'UNKNOWN'}">RUNNING</span>
+</th:block>
+
+<!-- Fragment for the standard status indicator container -->
+<div th:fragment="indicator" 
+     th:id="'status-indicator-' + ${terminal.terminalId}" 
+     class="flex items-center gap-2 mt-1" 
+     xmlns:th="http://www.thymeleaf.org">
+  <th:block th:replace="~{:: indicator-content}"></th:block>
+</div>
+
+<!-- Fragment for HTMX Out-of-Band updates -->
+<div th:fragment="oob-updates" xmlns:th="http://www.thymeleaf.org">
+  <div th:each="terminal : ${terminals}" 
+       th:id="'status-indicator-' + ${terminal.terminalId}" 
+       hx-swap-oob="true"
+       class="flex items-center gap-2 mt-1">
+    <th:block th:replace="~{:: indicator-content}"></th:block>
+  </div>
+</div>

@@ -13,16 +13,7 @@
           </div>
           <div>
             <h3 class="font-bold text-[#1E293B] text-lg leading-tight group-hover:text-blue-600 transition-colors" th:text="${terminal.name}">Terminal Name</h3>
-            <div class="flex items-center gap-2 mt-1">
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                      th:classappend="${terminal.status.name() == 'CONNECTED' ? 'bg-green-400' : (terminal.status.name() == 'ERROR' ? 'bg-red-400' : 'bg-slate-400')}"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2"
-                      th:classappend="${terminal.status.name() == 'CONNECTED' ? 'bg-green-500' : (terminal.status.name() == 'ERROR' ? 'bg-red-500' : 'bg-slate-500')}"></span>
-              </span>
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500" 
-                    th:text="${#messages.msg('terminal.status.' + terminal.status)}">RUNNING</span>
-            </div>
+            <div th:replace="~{fragments/terminal-status :: indicator}"></div>
           </div>
         </div>
 
@@ -121,5 +112,13 @@
     <p class="text-slate-500 max-w-xs text-center text-sm leading-relaxed" th:text="#{terminal.empty.description}">
       Register your first terminal using the AlgoCD Agent to see it here.
     </p>
+  </div>
+
+  <!-- Polling for Statuses (OOB) -->
+  <div th:if="${not #lists.isEmpty(terminals)}"
+       th:attr="hx-get=@{/terminals/statuses(page=${currentPage}, size=${pageSize})}"
+       hx-trigger="every 5s"
+       hx-swap="none"
+       class="hidden">
   </div>
 </div>

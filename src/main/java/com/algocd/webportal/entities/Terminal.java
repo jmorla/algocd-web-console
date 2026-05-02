@@ -26,6 +26,8 @@ public class Terminal {
 
     private Instant bootstrapTokenExpiresAt;
 
+    private Instant lastHeartbeatAt;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -33,13 +35,14 @@ public class Terminal {
     public Terminal() {
     }
 
-    public Terminal(UUID terminalId, UUID userId, TerminalStatus status, String instanceIp, String bootstrapToken, Instant bootstrapTokenExpiresAt, Instant createdAt, Instant updatedAt) {
+    public Terminal(UUID terminalId, UUID userId, TerminalStatus status, String instanceIp, String bootstrapToken, Instant bootstrapTokenExpiresAt, Instant lastHeartbeatAt, Instant createdAt, Instant updatedAt) {
         this.terminalId = terminalId;
         this.userId = userId;
         this.status = status;
         this.instanceIp = instanceIp;
         this.bootstrapToken = bootstrapToken;
         this.bootstrapTokenExpiresAt = bootstrapTokenExpiresAt;
+        this.lastHeartbeatAt = lastHeartbeatAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -92,6 +95,14 @@ public class Terminal {
         this.bootstrapTokenExpiresAt = bootstrapTokenExpiresAt;
     }
 
+    public Instant getLastHeartbeatAt() {
+        return lastHeartbeatAt;
+    }
+
+    public void setLastHeartbeatAt(Instant lastHeartbeatAt) {
+        this.lastHeartbeatAt = lastHeartbeatAt;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -113,12 +124,12 @@ public class Terminal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Terminal terminal = (Terminal) o;
-        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && status == terminal.status && Objects.equals(instanceIp, terminal.instanceIp) && Objects.equals(bootstrapToken, terminal.bootstrapToken) && Objects.equals(bootstrapTokenExpiresAt, terminal.bootstrapTokenExpiresAt) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
+        return Objects.equals(terminalId, terminal.terminalId) && Objects.equals(userId, terminal.userId) && status == terminal.status && Objects.equals(instanceIp, terminal.instanceIp) && Objects.equals(bootstrapToken, terminal.bootstrapToken) && Objects.equals(bootstrapTokenExpiresAt, terminal.bootstrapTokenExpiresAt) && Objects.equals(lastHeartbeatAt, terminal.lastHeartbeatAt) && Objects.equals(createdAt, terminal.createdAt) && Objects.equals(updatedAt, terminal.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(terminalId, userId, status, instanceIp, bootstrapToken, bootstrapTokenExpiresAt, createdAt, updatedAt);
+        return Objects.hash(terminalId, userId, status, instanceIp, bootstrapToken, bootstrapTokenExpiresAt, lastHeartbeatAt, createdAt, updatedAt);
     }
 
     @Override
@@ -130,6 +141,7 @@ public class Terminal {
                 ", instanceIp='" + instanceIp + '\'' +
                 ", bootstrapToken='" + bootstrapToken + '\'' +
                 ", bootstrapTokenExpiresAt=" + bootstrapTokenExpiresAt +
+                ", lastHeartbeatAt=" + lastHeartbeatAt +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

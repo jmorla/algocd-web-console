@@ -1,6 +1,8 @@
 package com.algocd.webportal.controllers.grpc;
 
 import com.algocd.controlplane.grpc.ControlPlaneGrpc;
+import com.algocd.controlplane.grpc.HeartbeatRequest;
+import com.algocd.controlplane.grpc.HeartbeatResponse;
 import com.algocd.controlplane.grpc.JoinRequest;
 import com.algocd.controlplane.grpc.JoinResponse;
 import com.algocd.webportal.config.ClientIpInterceptor;
@@ -10,6 +12,8 @@ import com.algocd.webportal.util.Result;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.springframework.grpc.server.service.GrpcService;
+
+import java.util.UUID;
 
 @GrpcService
 public class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
@@ -36,6 +40,30 @@ public class ControlPlaneService extends ControlPlaneGrpc.ControlPlaneImplBase {
         } else {
             responseObserver.onError(Status.UNAUTHENTICATED
                     .withDescription(result.getError().getMessage())
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void heartbeat(HeartbeatRequest request, StreamObserver<HeartbeatResponse> responseObserver) {
+        try {
+            UUID terminalId = UUID.fromString(request.getTerminalId());
+            Result<Void> result = terminalService.heartbeat(terminalId);
+
+            if (result.isSuccess()) {
+                HeartbeatResponse response = HeartbeatResponse.newBuilder()
+                        .setSuccess(true)
+                        .build();
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            } else {
+                responseObserver.onError(Status.INTERNAL
+                        .withDescription(result.getError().getMessage())
+                        .asRuntimeException());
+            }
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(Status.INVALID_ARGUMENT
+                    .withDescription("Invalid terminal ID format")
                     .asRuntimeException());
         }
     }

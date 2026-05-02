@@ -10,6 +10,9 @@ service ControlPlane {
     // Join a terminal using a bootstrap token.
     // This is the first step for a new terminal to register with the control plane.
     rpc Join(JoinRequest) returns (JoinResponse);
+
+    // Heartbeat from a terminal to keep the session alive and update status.
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }
 
 message JoinRequest {
@@ -20,4 +23,14 @@ message JoinRequest {
 message JoinResponse {
     // The UUID of the terminal.
     string terminal_id = 1;
+}
+
+message HeartbeatRequest {
+    // The UUID of the terminal.
+    string terminal_id = 1;
+}
+
+message HeartbeatResponse {
+    // Success indicator.
+    bool success = 1;
 }

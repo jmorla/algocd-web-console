@@ -37,3 +37,9 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+algocd:
+  terminal:
+    heartbeat:
+      interval: 5s
+      ttl: 30s
+

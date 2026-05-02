@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/terminals")
@@ -46,6 +47,18 @@ public class TerminalsController {
             Model model) {
         populateTerminalsModel(user, page, size, model);
         return "fragments/terminals-list :: terminalsList";
+    }
+
+    @GetMapping("/statuses")
+    public String terminalStatuses(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        int offset = (page - 1) * size;
+        List<TerminalSummary> terminals = terminalMapper.findStatusesByUserId(user.getUserId(), size, offset);
+        model.addAttribute("terminals", terminals);
+        return "fragments/terminal-status :: oob-updates";
     }
 
     @GetMapping("/create")
