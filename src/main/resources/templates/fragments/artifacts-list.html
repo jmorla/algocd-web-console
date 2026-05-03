@@ -19,10 +19,12 @@
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="border-b border-slate-100">
-          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.name}">Expert</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.name}">Artifact</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.filename}">Filename</th>
           <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.platform}">Platform</th>
           <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.table.column.size}">Size</th>
           <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.table.column.created}">Created</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.table.column.actions}">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-50">
@@ -42,6 +44,9 @@
             </div>
           </td>
           <td class="px-6 py-2.5">
+            <span class="text-sm text-slate-600 font-medium" th:text="${artifact.filename}">Filename.ex4</span>
+          </td>
+          <td class="px-6 py-2.5">
             <span th:if="${artifact.platform != null}" 
                   th:text="#{${'platform.' + artifact.platform}}"
                   th:classappend="${artifact.platform == T(com.algocd.webportal.entities.Platform).METATRADER_4 ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}"
@@ -53,6 +58,27 @@
           </td>
           <td class="px-6 py-2.5 text-right text-sm text-slate-500" th:text="${#temporals.format(artifact.createdAt, 'MMM dd, yyyy')}">
             May 02, 2026
+          </td>
+          <td class="px-6 py-2.5 text-right relative" x-data="{ open: false }">
+            <button @click="open = !open" @click.away="open = false" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors">
+              <i data-lucide="more-vertical" class="w-4 h-4"></i>
+            </button>
+            
+            <div x-show="open" x-cloak
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 class="absolute right-6 top-10 w-36 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 text-left">
+              <a href="#" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-[#1E293B] transition-colors">
+                <i data-lucide="settings-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span th:text="#{repository.action.manage}">Manage</span>
+              </a>
+              <div class="h-px bg-slate-100 my-1 mx-2"></div>
+              <button class="flex items-center gap-2 px-3 py-1.5 w-full text-xs font-bold text-red-500 hover:bg-red-50 transition-colors">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span th:text="#{repository.action.delete}">Delete</span>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

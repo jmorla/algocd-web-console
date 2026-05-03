@@ -21,9 +21,9 @@
             <p class="text-slate-500 text-sm" th:text="#{repository.header.subtitle}">Manage your trading experts and market indicators in one place.</p>
           </div>
           <div class="flex items-center gap-3">
-            <a href="/upload-experts.html" class="flex items-center gap-2 bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-[#1D4ED8] transition-colors">
+            <a th:href="@{/repository/upload}" class="flex items-center gap-2 bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-[#1D4ED8] transition-colors">
               <i data-lucide="upload" class="w-4 h-4"></i>
-              <span th:text="#{repository.header.button.upload}">Upload Experts</span>
+              <span th:text="#{repository.header.button.upload}">Upload Artifact</span>
             </a>
           </div>
         </header>

@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/20260502140000-create-artifacts-table.yaml
   - include:
       file: db/changelog/20260502150000-add-platform-and-version-to-artifacts.yaml
+  - include:
+      file: db/changelog/20260503100000-add-filename-to-artifacts.yaml

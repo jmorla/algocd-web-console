@@ -12,16 +12,16 @@ public interface ArtifactMapper {
 
     @Insert("""
         INSERT INTO artifacts (
-            artifact_id, user_id, name, digest, type, size_bytes, platform, version, created_at
+            artifact_id, user_id, name, digest, type, size_bytes, platform, version, filename, created_at
         ) VALUES (
             #{artifactId, jdbcType=OTHER}, #{userId, jdbcType=OTHER}, 
-            #{name}, #{digest}, #{type}, #{sizeBytes}, #{platform}, #{version}, #{createdAt}
+            #{name}, #{digest}, #{type}, #{sizeBytes}, #{platform}, #{version}, #{filename}, #{createdAt}
         )
         """)
     void insert(Artifact artifact);
 
     @Select("""
-        SELECT artifact_id, user_id, name, digest, type, size_bytes, platform, version, created_at
+        SELECT artifact_id, user_id, name, digest, type, size_bytes, platform, version, filename, created_at
         FROM artifacts
         WHERE user_id = #{userId, jdbcType=OTHER} AND type = #{type}
         ORDER BY created_at DESC

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AlgoCD - Upload Experts</title>
+    <title th:text="#{repository.upload.title}">AlgoCD - Upload Artifacts</title>
     <link rel="stylesheet" href="/dist/main.css" />
   </head>
   <body>
@@ -16,8 +16,8 @@
       <main class="flex-1 h-full overflow-y-auto px-48 pt-8 pb-12">
           <header class="flex items-center justify-between mb-8">
             <div>
-              <h1 class="text-2xl font-bold text-[#1E293B]">Upload Expert Advisors</h1>
-              <p class="text-slate-500 text-sm">Deploy new trading strategies to your terminal by uploading EA files.</p>
+              <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{repository.upload.header.title}">Upload Artifacts</h1>
+              <p class="text-slate-500 text-sm" th:text="#{repository.upload.header.subtitle}">Deploy new trading strategies to your terminal by uploading artifact files.</p>
             </div>
           </header>
 
@@ -37,12 +37,12 @@
                     <i data-lucide="chevron-down" class="w-4 h-4"></i>
                   </div>
                 </div>
-                <p class="mt-2 text-xs text-slate-400 italic">Identify this lot of experts (e.g., MAY-2026-1) to manage deployments across terminal.</p>
+                <p class="mt-2 text-xs text-slate-400 italic">Identify this lot of artifacts (e.g., MAY-2026-1) to manage deployments across terminal.</p>
               </div>
 
               <!-- Drag & Drop Zone -->
               <div>
-                <label class="block text-sm font-bold text-[#1E293B] mb-3">Expert Files (.ex4, .ex5, .mq4, .mq5)</label>
+                <label class="block text-sm font-bold text-[#1E293B] mb-3">Artifact Files (.ex4, .ex5, .mq4, .mq5)</label>
                 <div id="drop-zone" class="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 hover:border-[#2563EB]/50 transition-all cursor-pointer group">
                   <input type="file" id="file-input" class="hidden" multiple accept=".ex4,.ex5,.mq4,.mq5">
                   <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -78,11 +78,11 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <a href="/repository.html" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">
+                  <a th:href="@{/repository}" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" th:text="#{common.cancel}">
                     Cancel
                   </a>
-                  <button class="bg-[#2563EB] text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1D4ED8] transition-all hover:scale-[1.01] active:scale-[0.99]">
-                    Deploy Experts
+                  <button class="bg-[#2563EB] text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1D4ED8] transition-all hover:scale-[1.01] active:scale-[0.99]" th:text="#{repository.upload.button.deploy}">
+                    Deploy Artifacts
                   </button>
                 </div>
               </div>
