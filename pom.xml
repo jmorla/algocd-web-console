@@ -31,6 +31,7 @@
 		<grpc.version>1.77.1</grpc.version>
 		<protobuf-java.version>4.33.4</protobuf-java.version>
 		<spring-grpc.version>1.0.3</spring-grpc.version>
+		<oras-java-sdk.version>0.5.1</oras-java-sdk.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -65,6 +66,11 @@
 			<groupId>io.github.wimdeblauwe</groupId>
 			<artifactId>htmx-spring-boot-thymeleaf</artifactId>
 			<version>5.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>land.oras</groupId>
+			<artifactId>oras-java-sdk</artifactId>
+			<version>${oras-java-sdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>

@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260502150000-add-platform-and-version-to-artifacts
+      author: system
+      changes:
+        - addColumn:
+            tableName: artifacts
+            columns:
+              - column:
+                  name: platform
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: version
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true

@@ -1,0 +1,94 @@
+<div th:fragment="artifactsList(artifacts, type, currentPage, totalPages, totalCount, size)" xmlns:th="http://www.thymeleaf.org" th:id="${type.toLowerCase() + '-list'}">
+  <!-- Empty State -->
+  <div th:if="${#lists.isEmpty(artifacts)}" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center justify-center py-24 px-6">
+    <div class="w-48 h-48 mb-8 relative flex items-center justify-center">
+      <img th:src="${type == 'EXPERT' ? '/experts-empty.svg' : '/indicators-empty.svg'}" 
+           th:alt="#{${type == 'EXPERT' ? 'repository.experts.empty.alt' : 'repository.indicators.empty.alt'}}" 
+           class="w-full h-full">
+    </div>
+    <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center" 
+        th:text="#{${type == 'EXPERT' ? 'repository.experts.empty.title' : 'repository.indicators.empty.title'}}">No artifacts yet</h2>
+    <p class="text-slate-500 max-w-xs text-center mb-8 text-sm leading-relaxed" 
+       th:text="#{${type == 'EXPERT' ? 'repository.experts.empty.description' : 'repository.indicators.empty.description'}}">
+      Description...
+    </p>
+  </div>
+
+  <!-- Table Content -->
+  <div th:unless="${#lists.isEmpty(artifacts)}" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-slate-100">
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.name}">Expert</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.table.column.platform}">Platform</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.table.column.size}">Size</th>
+          <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.table.column.created}">Created</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        <tr th:each="artifact : ${artifacts}" class="hover:bg-slate-50 transition-colors group">
+          <td class="px-6 py-2.5">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" 
+                   th:classappend="${type == 'EXPERT' ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}">
+                <i th:attr="data-lucide=${type == 'EXPERT' ? 'graduation-cap' : 'activity'}" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="flex flex-col">
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-sm text-slate-700" th:text="${artifact.name}">ArtifactName</span>
+                </div>
+                <code class="text-[10px] text-slate-400 font-mono" th:text="${artifact.digest}">sha256:abcd...</code>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-2.5">
+            <span th:if="${artifact.platform != null}" 
+                  th:text="#{${'platform.' + artifact.platform}}"
+                  th:classappend="${artifact.platform == T(com.algocd.webportal.entities.Platform).METATRADER_4 ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}"
+                  class="px-2 py-0.5 rounded text-[10px] font-bold inline-block">MetaTrader 4</span>
+            <span th:if="${artifact.platform == null}" class="text-sm text-slate-400">-</span>
+          </td>
+          <td class="px-6 py-2.5 text-right text-sm text-slate-600">
+            <span th:text="${artifact.sizeBytes < 1024 ? artifact.sizeBytes + ' B' : (artifact.sizeBytes < 1048576 ? (artifact.sizeBytes / 1024) + ' KB' : (artifact.sizeBytes / 1048576) + ' MB')}">1.2 MB</span>
+          </td>
+          <td class="px-6 py-2.5 text-right text-sm text-slate-500" th:text="${#temporals.format(artifact.createdAt, 'MMM dd, yyyy')}">
+            May 02, 2026
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination Footer -->
+    <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-between">
+      <p class="text-[12px] font-medium text-slate-500" 
+         th:text="#{${type == 'EXPERT' ? 'repository.pagination.info.experts' : 'repository.pagination.info.indicators'}(${artifacts.size()}, ${totalCount})}">
+        Showing 5 of 12 experts
+      </p>
+      <div class="flex items-center gap-2">
+        <button hx-get th:attr="hx-get=@{/repository/list(type=${type}, page=${currentPage - 1}, size=${size})}, hx-target='#' + ${type.toLowerCase() + '-list'}"
+                th:classappend="${currentPage <= 1} ? 'pointer-events-none opacity-50' : 'hover:text-slate-600 hover:bg-slate-50'"
+                hx-swap="outerHTML"
+                class="p-1.5 rounded-lg border border-slate-200 text-slate-400 transition-all"
+                th:disabled="${currentPage <= 1}">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+        <div class="flex items-center gap-1">
+          <th:block th:each="pageNum : ${#numbers.sequence(1, totalPages > 0 ? totalPages : 1)}">
+            <button hx-get th:attr="hx-get=@{/repository/list(type=${type}, page=${pageNum}, size=${size})}, hx-target='#' + ${type.toLowerCase() + '-list'}"
+                    hx-swap="outerHTML"
+                    th:classappend="${pageNum == currentPage} ? 'bg-[#2563EB] text-white' : 'hover:bg-slate-50 text-slate-600'"
+                    class="w-8 h-8 rounded-lg text-[12px] font-bold transition-all flex items-center justify-center"
+                    th:text="${pageNum}">1</button>
+          </th:block>
+        </div>
+        <button hx-get th:attr="hx-get=@{/repository/list(type=${type}, page=${currentPage + 1}, size=${size})}, hx-target='#' + ${type.toLowerCase() + '-list'}"
+                th:classappend="${currentPage >= totalPages} ? 'pointer-events-none opacity-50' : 'hover:text-slate-600 hover:bg-slate-50'"
+                hx-swap="outerHTML"
+                class="p-1.5 rounded-lg border border-slate-200 text-slate-400 transition-all"
+                th:disabled="${currentPage >= totalPages}">
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

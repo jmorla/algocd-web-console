@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/20260502123000-drop-name-from-terminals.yaml
   - include:
       file: db/changelog/20260502130000-add-last-heartbeat-to-terminals.yaml
+  - include:
+      file: db/changelog/20260502140000-create-artifacts-table.yaml
+  - include:
+      file: db/changelog/20260502150000-add-platform-and-version-to-artifacts.yaml

@@ -35,7 +35,7 @@ public interface TerminalMapper {
         LEFT JOIN tags tag_name ON tag_name.resource_id = CAST(t.terminal_id AS VARCHAR) AND tag_name.tag_key = 'name'
         LEFT JOIN tags tag_platform ON tag_platform.resource_id = CAST(t.terminal_id AS VARCHAR) AND tag_platform.tag_key = 'platform'
         WHERE t.user_id = #{userId, jdbcType=OTHER}
-        ORDER BY t.created_at DESC
+        ORDER BY t.created_at ASC
         LIMIT #{limit} OFFSET #{offset}
         """)
     List<TerminalSummary> findTerminalsByUserId(@Param("userId") UUID userId, @Param("limit") int limit, @Param("offset") int offset);

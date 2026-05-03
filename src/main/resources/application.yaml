@@ -38,6 +38,17 @@ mybatis:
     map-underscore-to-camel-case: true
 
 algocd:
+  registry:
+    host: ${REGISTRY_HOST:localhost}
+    port: ${REGISTRY_PORT:5000}
+    username: ${REGISTRY_USERNAME:}
+    password: ${REGISTRY_PASSWORD:}
+    tls-enabled: ${REGISTRY_TLS_ENABLED:false}
+  app:
+    credentials:
+      private-key-path: ${APP_PRIVATE_KEY_PATH:}
+      certificate-path: ${APP_CERTIFICATE_PATH:}
+      ca-certificate-path: ${APP_CA_CERTIFICATE_PATH:}
   terminal:
     heartbeat:
       interval: 5s

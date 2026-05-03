@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AlgoCD - Repository</title>
+    <title th:text="#{repository.title}">AlgoCD - Repository</title>
     <link rel="stylesheet" href="/dist/main.css" />
   </head>
   <body>
@@ -13,63 +13,39 @@
       <aside th:replace="~{fragments/sidebar :: sidebar('repository')}"></aside>
 
       <!-- Main Content (Scrollable) -->
-      <main class="flex-1 h-full overflow-y-auto px-48 py-12">
+      <main class="flex-1 h-full overflow-y-auto px-48 pt-8 pb-12">
         <!-- Header -->
-        <header class="flex items-center justify-between mb-8">
+        <header class="flex items-center justify-between mb-6">
           <div>
-            <h1 class="text-2xl font-bold text-[#1E293B]">Repository</h1>
-            <p class="text-slate-500 text-sm">Manage your trading experts and market indicators in one place.</p>
+            <h1 class="text-2xl font-bold text-[#1E293B]" th:text="#{repository.header.title}">Repository</h1>
+            <p class="text-slate-500 text-sm" th:text="#{repository.header.subtitle}">Manage your trading experts and market indicators in one place.</p>
           </div>
           <div class="flex items-center gap-3">
-            <button class="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-slate-50 transition-colors">
-              <i data-lucide="package" class="w-4 h-4 text-slate-400"></i>
-              Manage Releases
-            </button>
             <a href="/upload-experts.html" class="flex items-center gap-2 bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:bg-[#1D4ED8] transition-colors">
               <i data-lucide="upload" class="w-4 h-4"></i>
-              Upload Experts
+              <span th:text="#{repository.header.button.upload}">Upload Experts</span>
             </a>
           </div>
         </header>
 
         <!-- Tabs -->
-        <div class="flex items-center gap-8 border-b border-slate-200 mb-8">
-          <button id="tab-experts" class="px-1 py-4 text-sm font-bold text-[#2563EB] border-b-2 border-[#2563EB] transition-all">
+        <div class="flex items-center gap-8 border-b border-slate-200 mb-6">
+          <button id="tab-experts" class="px-1 py-2.5 text-sm font-bold text-[#2563EB] border-b-2 border-[#2563EB] transition-all" th:text="#{repository.tabs.experts}">
             Expert Advisors
           </button>
-          <button id="tab-indicators" class="px-1 py-4 text-sm font-medium text-slate-500 hover:text-slate-700 transition-all border-b-2 border-transparent">
+          <button id="tab-indicators" class="px-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition-all border-b-2 border-transparent" th:text="#{repository.tabs.indicators}">
             Indicators
           </button>
         </div>
         
         <!-- Expert Advisors Content -->
         <div id="content-experts" class="block">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center justify-center py-24 px-6">
-            <div class="w-48 h-48 mb-8 relative flex items-center justify-center">
-              <img src="/experts-empty.svg" alt="No experts illustration" class="w-full h-full">
-            </div>
-            <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center">No Expert Advisors yet</h2>
-            <p class="text-slate-500 max-w-xs text-center mb-8 text-sm leading-relaxed">
-              Expert Advisors are the brains of your operation. Upload your EA files to start automating your trading strategies across your terminal.
-            </p>
-            <a href="/upload-experts.html" class="flex items-center gap-2 bg-[#2563EB] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-[#1D4ED8] transition-all hover:scale-[1.02] active:scale-[0.98]">
-              <i data-lucide="upload" class="w-4 h-4"></i>
-              Upload Experts
-            </a>
-          </div>
+          <div th:replace="~{fragments/artifacts-list :: artifactsList(${experts}, 'EXPERT', ${expertPage}, ${totalExpertPages}, ${totalExperts}, ${pageSize})}"></div>
         </div>
 
         <!-- Indicators Content -->
         <div id="content-indicators" class="hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col items-center justify-center py-24 px-6">
-            <div class="w-48 h-48 mb-8 relative flex items-center justify-center">
-              <img src="/indicators-empty.svg" alt="No indicators illustration" class="w-full h-full">
-            </div>
-            <h2 class="text-2xl font-bold text-[#1E293B] mb-2 text-center">No Indicators configured</h2>
-            <p class="text-slate-500 max-w-xs text-center mb-8 text-sm leading-relaxed">
-              Market indicators help you identify the perfect entry and exit points. Configure your first indicator to start receiving real-time signals.
-            </p>
-          </div>
+          <div th:replace="~{fragments/artifacts-list :: artifactsList(${indicators}, 'INDICATOR', ${indicatorPage}, ${totalIndicatorPages}, ${totalIndicators}, ${pageSize})}"></div>
         </div>
       </main>
     </div>
@@ -80,7 +56,7 @@
       const contentExperts = document.getElementById('content-experts');
       const contentIndicators = document.getElementById('content-indicators');
 
-      tabExperts.addEventListener('click', () => {
+      const showExperts = () => {
         tabExperts.classList.add('text-[#2563EB]', 'border-[#2563EB]');
         tabExperts.classList.remove('text-slate-500', 'border-transparent');
         tabIndicators.classList.remove('text-[#2563EB]', 'border-[#2563EB]');
@@ -88,9 +64,9 @@
         
         contentExperts.classList.remove('hidden');
         contentIndicators.classList.add('hidden');
-      });
+      };
 
-      tabIndicators.addEventListener('click', () => {
+      const showIndicators = () => {
         tabIndicators.classList.add('text-[#2563EB]', 'border-[#2563EB]');
         tabIndicators.classList.remove('text-slate-500', 'border-transparent');
         tabExperts.classList.remove('text-[#2563EB]', 'border-[#2563EB]');
@@ -98,7 +74,19 @@
         
         contentIndicators.classList.remove('hidden');
         contentExperts.classList.add('hidden');
-      });
+      };
+
+      tabExperts.addEventListener('click', showExperts);
+      tabIndicators.addEventListener('click', showIndicators);
+
+      // Handle initial tab from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeTab = urlParams.get('tab');
+      if (activeTab === 'indicators') {
+        showIndicators();
+      } else {
+        showExperts();
+      }
     </script>
   </body>
 </html>
