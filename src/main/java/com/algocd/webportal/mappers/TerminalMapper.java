@@ -12,10 +12,10 @@ public interface TerminalMapper {
 
     @Insert("""
         INSERT INTO terminals (
-            terminal_id, user_id, status, instance_ip, 
+            terminal_id, status, instance_ip, 
             bootstrap_token, bootstrap_token_expires_at, created_at, updated_at
         ) VALUES (
-            #{terminalId, jdbcType=OTHER}, #{userId, jdbcType=OTHER}, 
+            #{terminalId, jdbcType=OTHER}, 
             #{status}, #{instanceIp}, #{bootstrapToken}, #{bootstrapTokenExpiresAt}, 
             #{createdAt}, #{updatedAt}
         )
@@ -34,14 +34,13 @@ public interface TerminalMapper {
         FROM terminals t
         LEFT JOIN tags tag_name ON tag_name.resource_id = CAST(t.terminal_id AS VARCHAR) AND tag_name.tag_key = 'name'
         LEFT JOIN tags tag_platform ON tag_platform.resource_id = CAST(t.terminal_id AS VARCHAR) AND tag_platform.tag_key = 'platform'
-        WHERE t.user_id = #{userId, jdbcType=OTHER}
         ORDER BY t.created_at ASC
         LIMIT #{limit} OFFSET #{offset}
         """)
-    List<TerminalSummary> findTerminalsByUserId(@Param("userId") UUID userId, @Param("limit") int limit, @Param("offset") int offset);
+    List<TerminalSummary> findAllTerminals(@Param("limit") int limit, @Param("offset") int offset);
 
-    @Select("SELECT COUNT(*) FROM terminals WHERE user_id = #{userId, jdbcType=OTHER}")
-    long countTerminalsByUserId(@Param("userId") UUID userId);
+    @Select("SELECT COUNT(*) FROM terminals")
+    long countAllTerminals();
 
     @Update("""
         UPDATE terminals 
@@ -81,7 +80,7 @@ public interface TerminalMapper {
     );
 
     @Select("""
-        SELECT terminal_id, user_id, status, instance_ip, bootstrap_token, bootstrap_token_expires_at, last_heartbeat_at, created_at, updated_at
+        SELECT terminal_id, status, instance_ip, bootstrap_token, bootstrap_token_expires_at, last_heartbeat_at, created_at, updated_at
         FROM terminals
         WHERE bootstrap_token = #{bootstrapToken}
         """)
@@ -116,9 +115,8 @@ public interface TerminalMapper {
     @Select("""
         SELECT terminal_id, status 
         FROM terminals 
-        WHERE user_id = #{userId, jdbcType=OTHER}
         ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
         """)
-    List<TerminalSummary> findStatusesByUserId(@Param("userId") java.util.UUID userId, @Param("limit") int limit, @Param("offset") int offset);
+    List<TerminalSummary> findAllStatuses(@Param("limit") int limit, @Param("offset") int offset);
 }

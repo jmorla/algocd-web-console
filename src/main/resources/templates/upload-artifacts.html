@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="#{repository.upload.title}">AlgoCD - Upload Artifacts</title>
     <link rel="stylesheet" href="/dist/main.css" />
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #E2E8F0;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #CBD5E1;
+      }
+    </style>
   </head>
   <body>
     <div class="h-screen bg-[#F8FAFC] flex font-sans text-[#1E293B] overflow-hidden">
@@ -21,46 +36,98 @@
             </div>
           </header>
 
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-            <div class="space-y-8">
-              <!-- Release Identification -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8"
+               x-data="{ 
+                selectedTags: [], 
+                customKey: '',
+                customValue: '',
+                addTag(key, value) {
+                    key = key.trim();
+                    value = value.trim();
+                    if (!key || !value) return;
+                    this.selectedTags = this.selectedTags.filter(t => t.key !== key);
+                    this.selectedTags.push({key, value});
+                    this.customKey = '';
+                    this.customValue = '';
+                },
+                removeTag(key) {
+                    this.selectedTags = this.selectedTags.filter(t => t.key !== key);
+                }
+              }">
+            <form hx-post="/repository/upload" hx-encoding="multipart/form-data" class="space-y-8">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              
+              <!-- Tags Section -->
               <div>
-                <label class="block text-sm font-bold text-[#1E293B] mb-3">Release Identification</label>
-                <div class="relative">
-                  <select class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3.5 pr-10 outline-none transition-all">
-                    <option value="" disabled selected>Select or identify the release batch</option>
-                    <option value="MAY-2026-1">MAY-2026-1 (Active Batch)</option>
-                    <option value="APR-2026-4">APR-2026-4 (Legacy)</option>
-                    <option value="new">+ Create New Batch Identifier</option>
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                  </div>
+                <label class="block text-sm font-bold text-[#1E293B] mb-3" th:text="#{terminal.create.section4.title}">Tags & Labels</label>
+                <p class="text-xs text-slate-500 mb-4" th:text="#{terminal.create.section4.description}">Add labels to organize and filter your artifacts.</p>
+                
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <template x-for="tag in selectedTags" :key="tag.key">
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 group transition-all hover:bg-blue-100">
+                            <span x-text="tag.key + ': ' + tag.value"></span>
+                            <button type="button" @click="removeTag(tag.key)" class="ml-2 inline-flex items-center justify-center h-4 w-4 rounded-full text-blue-400 hover:bg-blue-300 hover:text-blue-600 focus:outline-none">
+                                <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                                    <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
+                                </svg>
+                            </button>
+                            <input type="hidden" :name="'tags[' + tag.key + ']'" :value="tag.value">
+                        </span>
+                    </template>
                 </div>
-                <p class="mt-2 text-xs text-slate-400 italic">Identify this lot of artifacts (e.g., MAY-2026-1) to manage deployments across terminal.</p>
+
+                <div class="flex gap-2 mb-4">
+                    <input type="text" x-model="customKey" @keydown.enter.prevent="$refs.valueInput.focus()"
+                           class="w-1/3 px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                           th:placeholder="#{terminal.create.section4.placeholder.key}">
+                    <input type="text" x-ref="valueInput" x-model="customValue" @keydown.enter.prevent="addTag(customKey, customValue)"
+                           class="flex-1 px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                           th:placeholder="#{terminal.create.section4.placeholder.value}">
+                    <button type="button" @click="addTag(customKey, customValue)"
+                            class="px-5 py-2.5 text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200"
+                            th:text="#{terminal.create.section4.button.add}">
+                        Add
+                    </button>
+                </div>
+
+                <div>
+                    <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-2" th:text="#{terminal.create.section4.suggested.keys}">Suggested Keys</p>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="suggested in ['env', 'strategy', 'tier', 'cluster', 'region', 'version', 'release']" :key="suggested">
+                            <button type="button" @click="customKey = suggested; $refs.valueInput.focus()"
+                                    class="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 transition-all text-slate-600 bg-white"
+                                    x-text="suggested">
+                            </button>
+                        </template>
+                    </div>
+                </div>
               </div>
 
               <!-- Drag & Drop Zone -->
               <div>
-                <label class="block text-sm font-bold text-[#1E293B] mb-3">Artifact Files (.ex4, .ex5, .mq4, .mq5)</label>
-                <div id="drop-zone" class="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 hover:border-[#2563EB]/50 transition-all cursor-pointer group">
-                  <input type="file" id="file-input" class="hidden" multiple accept=".ex4,.ex5,.mq4,.mq5">
-                  <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <i data-lucide="upload-cloud" class="w-8 h-8 text-[#2563EB]"></i>
-                  </div>
-                  <p class="text-sm font-bold text-[#1E293B] mb-1">Click to upload or drag and drop</p>
-                  <p class="text-xs text-slate-500">Supported: .ex4, .ex5, .mq4, .mq5</p>
-                </div>
+                <label class="block text-sm font-bold text-[#1E293B] mb-3" th:text="#{repository.upload.files.label}">Artifact Files (.mql5)</label>
                 
-                <div class="mt-4 p-4 bg-blue-50/50 border border-blue-100 rounded-xl flex items-start gap-3">
-                  <i data-lucide="info" class="w-5 h-5 text-[#2563EB] shrink-0 mt-0.5"></i>
-                  <p class="text-xs text-blue-700 leading-relaxed">
-                    <strong>Auto-Compilation:</strong> Source files (.mq4, .mq5) will be automatically compiled into executable binaries (.ex4, .ex5) before deployment to your terminal.
-                  </p>
+                <div id="drop-zone-container">
+                  <div id="drop-zone" class="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 hover:border-[#2563EB]/50 transition-all cursor-pointer group">
+                    <input type="file" id="file-input" name="files" class="hidden" multiple accept=".mq5,.mql5">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <i data-lucide="upload-cloud" class="w-8 h-8 text-[#2563EB]"></i>
+                    </div>
+                    <p class="text-sm font-bold text-[#1E293B] mb-1" th:text="#{repository.upload.files.placeholder}">Click to upload or drag and drop</p>
+                    <p class="text-xs text-slate-500" th:text="#{repository.upload.files.supported}">Supported: .mql5</p>
+                  </div>
+                  
+                  <div class="mt-4 p-4 bg-blue-50/50 border border-blue-100 rounded-xl flex items-start gap-3">
+                    <i data-lucide="info" class="w-5 h-5 text-[#2563EB] shrink-0 mt-0.5"></i>
+                    <p class="text-xs text-blue-700 leading-relaxed">
+                      <strong th:text="#{repository.upload.files.note.title}">Auto-Compilation</strong>: 
+                      <span th:text="#{repository.upload.files.note.description}">Source files (.mql5) will be automatically compiled into executable binaries (.ex5) before deployment to your terminal.</span>
+                    </p>
+                  </div>
                 </div>
                 
                 <!-- File List (Hidden by default) -->
-                <div id="file-list" class="mt-4 space-y-2 hidden">
+                <div id="file-list" class="mt-4 space-y-2 max-h-[320px] overflow-y-auto pr-1 hidden custom-scrollbar">
                   <!-- Files will be injected here -->
                 </div>
               </div>
@@ -69,24 +136,30 @@
               <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
                 <div id="upload-summary" class="hidden flex items-center gap-8">
                   <div class="flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Files</span>
-                    <span id="total-files-count" class="text-sm font-bold text-[#1E293B]">0 files</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{repository.upload.summary.total_files}">Total Files</span>
+                    <span id="total-files-count" class="text-sm font-bold text-[#1E293B]" 
+                          th:data-pattern="#{repository.upload.summary.count}"
+                          th:text="${#messages.msg('repository.upload.summary.count', 0)}">0 files</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Batch Size</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" th:text="#{repository.upload.summary.batch_size}">Batch Size</span>
                     <span id="total-files-size" class="text-sm font-bold text-[#1E293B]">0 KB</span>
                   </div>
+                  <button type="button" id="reset-upload" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all border border-slate-200 uppercase tracking-wider">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span th:text="#{repository.upload.button.reset}">Clear</span>
+                  </button>
                 </div>
                 <div class="flex items-center gap-3">
                   <a th:href="@{/repository}" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" th:text="#{common.cancel}">
                     Cancel
                   </a>
-                  <button class="bg-[#2563EB] text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1D4ED8] transition-all hover:scale-[1.01] active:scale-[0.99]" th:text="#{repository.upload.button.deploy}">
+                  <button type="submit" class="bg-[#2563EB] text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-[#1D4ED8] transition-all hover:scale-[1.01] active:scale-[0.99]" th:text="#{repository.upload.button.deploy}">
                     Deploy Artifacts
                   </button>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
       </main>
     </div>
@@ -95,16 +168,26 @@
     <script>
       // Simple UI logic for file selection
       const dropZone = document.getElementById('drop-zone');
+      const dropZoneContainer = document.getElementById('drop-zone-container');
       const fileInput = document.getElementById('file-input');
       const fileList = document.getElementById('file-list');
       const uploadSummary = document.getElementById('upload-summary');
       const totalFilesCount = document.getElementById('total-files-count');
       const totalFilesSize = document.getElementById('total-files-size');
+      const resetBtn = document.getElementById('reset-upload');
 
       dropZone.addEventListener('click', () => fileInput.click());
 
       fileInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
+      });
+
+      resetBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        fileList.innerHTML = '';
+        fileList.classList.add('hidden');
+        uploadSummary.classList.add('hidden');
+        dropZoneContainer.classList.remove('hidden');
       });
 
       dropZone.addEventListener('dragover', (e) => {
@@ -125,11 +208,13 @@
 
       function handleFiles(files) {
         if (files.length > 0) {
+          dropZoneContainer.classList.add('hidden');
           fileList.classList.remove('hidden');
           uploadSummary.classList.remove('hidden');
           
           let totalSize = 0;
-          totalFilesCount.textContent = `${files.length} file${files.length > 1 ? 's' : ''}`;
+          const countPattern = totalFilesCount.dataset.pattern || '{0} files';
+          totalFilesCount.textContent = countPattern.replace('{0}', files.length);
           
           fileList.innerHTML = Array.from(files).map(file => {
             totalSize += file.size;
@@ -144,9 +229,6 @@
                   <p class="text-[11px] text-slate-500">${(file.size / 1024).toFixed(1)} KB</p>
                 </div>
               </div>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <i data-lucide="x" class="w-4 h-4"></i>
-              </button>
             </div>
           `}).join('');
           

@@ -53,4 +53,6 @@ algocd:
     heartbeat:
       interval: 5s
       ttl: 30s
+  storage:
+    upload-dir: ${STORAGE_UPLOAD_DIR:/tmp/algocd-uploads}
 

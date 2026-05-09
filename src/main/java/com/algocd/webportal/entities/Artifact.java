@@ -12,9 +12,6 @@ public class Artifact {
     @NotNull
     private UUID artifactId;
 
-    @NotNull
-    private UUID userId;
-
     @NotBlank
     private String name;
 
@@ -38,9 +35,8 @@ public class Artifact {
     public Artifact() {
     }
 
-    public Artifact(UUID artifactId, UUID userId, String name, String digest, ArtifactType type, Long sizeBytes, Platform platform, String version, String filename, Instant createdAt) {
+    public Artifact(UUID artifactId, String name, String digest, ArtifactType type, Long sizeBytes, Platform platform, String version, String filename, Instant createdAt) {
         this.artifactId = artifactId;
-        this.userId = userId;
         this.name = name;
         this.digest = digest;
         this.type = type;
@@ -57,14 +53,6 @@ public class Artifact {
 
     public void setArtifactId(UUID artifactId) {
         this.artifactId = artifactId;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
     }
 
     public String getName() {
@@ -136,19 +124,18 @@ public class Artifact {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Artifact artifact = (Artifact) o;
-        return Objects.equals(artifactId, artifact.artifactId) && Objects.equals(userId, artifact.userId) && Objects.equals(name, artifact.name) && Objects.equals(digest, artifact.digest) && type == artifact.type && Objects.equals(sizeBytes, artifact.sizeBytes) && platform == artifact.platform && Objects.equals(version, artifact.version) && Objects.equals(filename, artifact.filename) && Objects.equals(createdAt, artifact.createdAt);
+        return Objects.equals(artifactId, artifact.artifactId) && Objects.equals(name, artifact.name) && Objects.equals(digest, artifact.digest) && type == artifact.type && Objects.equals(sizeBytes, artifact.sizeBytes) && platform == artifact.platform && Objects.equals(version, artifact.version) && Objects.equals(filename, artifact.filename) && Objects.equals(createdAt, artifact.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(artifactId, userId, name, digest, type, sizeBytes, platform, version, filename, createdAt);
+        return Objects.hash(artifactId, name, digest, type, sizeBytes, platform, version, filename, createdAt);
     }
 
     @Override
     public String toString() {
         return "Artifact{" +
                 "artifactId=" + artifactId +
-                ", userId=" + userId +
                 ", name='" + name + '\'' +
                 ", digest='" + digest + '\'' +
                 ", type=" + type +

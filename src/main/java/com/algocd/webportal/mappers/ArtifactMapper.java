@@ -12,32 +12,31 @@ public interface ArtifactMapper {
 
     @Insert("""
         INSERT INTO artifacts (
-            artifact_id, user_id, name, digest, type, size_bytes, platform, version, filename, created_at
+            artifact_id, name, digest, type, size_bytes, platform, version, filename, created_at
         ) VALUES (
-            #{artifactId, jdbcType=OTHER}, #{userId, jdbcType=OTHER}, 
+            #{artifactId, jdbcType=OTHER},
             #{name}, #{digest}, #{type}, #{sizeBytes}, #{platform}, #{version}, #{filename}, #{createdAt}
         )
         """)
     void insert(Artifact artifact);
 
     @Select("""
-        SELECT artifact_id, user_id, name, digest, type, size_bytes, platform, version, filename, created_at
+        SELECT artifact_id, name, digest, type, size_bytes, platform, version, filename, created_at
         FROM artifacts
-        WHERE user_id = #{userId, jdbcType=OTHER} AND type = #{type}
+        WHERE type = #{type}
         ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
         """)
-    List<Artifact> findArtifactsByUserIdAndType(
-            @Param("userId") UUID userId, 
+    List<Artifact> findArtifactsByType(
             @Param("type") ArtifactType type, 
             @Param("limit") int limit, 
             @Param("offset") int offset
     );
 
     @Select("""
-        SELECT COUNT(*) 
-        FROM artifacts 
-        WHERE user_id = #{userId, jdbcType=OTHER} AND type = #{type}
+        SELECT COUNT(*)
+        FROM artifacts
+        WHERE type = #{type}
         """)
-    long countArtifactsByUserIdAndType(@Param("userId") UUID userId, @Param("type") ArtifactType type);
+    long countArtifactsByType(@Param("type") ArtifactType type);
 }

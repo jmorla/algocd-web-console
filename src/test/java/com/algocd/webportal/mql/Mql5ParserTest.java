@@ -16,11 +16,11 @@ class Mql5ParserTest {
 
         Statement[] statements = parser.parse();
         assertEquals(1, statements.length);
-        assertTrue(statements[0] instanceof PropertyStatement);
+        assertInstanceOf(PropertyStatement.class, statements[0]);
         
         PropertyStatement prop = (PropertyStatement) statements[0];
         assertEquals("copyright", prop.name());
-        assertTrue(prop.value() instanceof Literal.StringLiteral);
+        assertInstanceOf(Literal.StringLiteral.class, prop.value());
         assertEquals("AlgoCD", ((Literal.StringLiteral) prop.value()).value());
     }
 
@@ -33,21 +33,21 @@ class Mql5ParserTest {
 
         Statement[] statements = parser.parse();
         assertEquals(2, statements.length);
-        
-        assertTrue(statements[0] instanceof VariableDeclaration);
+
+        assertInstanceOf(VariableDeclaration.class, statements[0]);
         VariableDeclaration var1 = (VariableDeclaration) statements[0];
         assertEquals(VariableDeclaration.Modifier.INPUT, var1.modifier());
         assertEquals(Token.TokenKind.INT, var1.type());
         assertEquals("Period", var1.name());
-        assertTrue(var1.value() instanceof Literal.NumberLiteral);
+        assertInstanceOf(Literal.NumberLiteral.class, var1.value());
         assertEquals("10", ((Literal.NumberLiteral) var1.value()).value());
 
-        assertTrue(statements[1] instanceof VariableDeclaration);
+        assertInstanceOf(VariableDeclaration.class, statements[1]);
         VariableDeclaration var2 = (VariableDeclaration) statements[1];
         assertEquals(VariableDeclaration.Modifier.EXTERN, var2.modifier());
         assertEquals(Token.TokenKind.DOUBLE, var2.type());
         assertEquals("Price", var2.name());
-        assertTrue(var2.value() instanceof Literal.NumberLiteral);
+        assertInstanceOf(Literal.NumberLiteral.class, var2.value());
         assertEquals("1.5", ((Literal.NumberLiteral) var2.value()).value());
     }
 

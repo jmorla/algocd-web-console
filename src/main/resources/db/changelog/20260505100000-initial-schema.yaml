@@ -1,0 +1,209 @@
+databaseChangeLog:
+  - changeSet:
+      id: initial-schema
+      author: jorge
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints: {primaryKey: true, nullable: false}
+              - column:
+                  name: username
+                  type: VARCHAR(50)
+                  constraints: {unique: true, nullable: true }
+              - column:
+                  name: email
+                  type: VARCHAR(50)
+                  constraints: { unique: true, nullable: false }
+              - column:
+                  name: password_hash
+                  type: VARCHAR(255)
+                  constraints: {nullable: false}
+              - column:
+                  name: onboarding_completed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: account_non_expired
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: account_non_locked
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: credentials_non_expired
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createTable:
+            tableName: tags
+            columns:
+              - column:
+                  name: resource_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_key
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_value
+                  type: VARCHAR(256)
+        - addPrimaryKey:
+            tableName: tags
+            columnNames: resource_id, tag_key
+            constraintName: pk_tags
+        - createIndex:
+            tableName: tags
+            indexName: idx_tags_key_value
+            columns:
+              - column:
+                  name: tag_key
+              - column:
+                  name: tag_value
+        - createTable:
+            tableName: terminals
+            columns:
+              - column:
+                  name: terminal_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: PROVISIONING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: instance_ip
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: bootstrap_token
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: bootstrap_token_expires_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_heartbeat_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createTable:
+            tableName: artifacts
+            columns:
+              - column:
+                  name: artifact_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: digest
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: size_bytes
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: platform
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: version
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: filename
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: artifact_upload_queue
+            columns:
+              - column:
+                  name: queue_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: original_filename
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_path
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: error_reason
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false

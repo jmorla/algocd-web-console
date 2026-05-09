@@ -1,6 +1,5 @@
 package com.algocd.webportal.controllers;
 
-import com.algocd.webportal.config.AuthenticatedUser;
 import com.algocd.webportal.entities.Platform;
 import com.algocd.webportal.entities.Terminal;
 import com.algocd.webportal.entities.TerminalSummary;
@@ -9,7 +8,6 @@ import com.algocd.webportal.services.TerminalService;
 import com.algocd.webportal.services.models.CreateTerminalRequest;
 import com.algocd.webportal.util.Result;
 import jakarta.validation.Valid;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/terminals")
@@ -32,31 +29,27 @@ public class TerminalsController {
     }
 
     @GetMapping
-    public String terminals(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            Model model) {
-        populateTerminalsModel(user, 1, 10, model);
+    public String terminals(Model model) {
+        populateTerminalsModel(1, 10, model);
         return "terminals";
     }
 
     @GetMapping("/list")
     public String terminalsList(
-            @AuthenticationPrincipal AuthenticatedUser user,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
-        populateTerminalsModel(user, page, size, model);
+        populateTerminalsModel(page, size, model);
         return "fragments/terminals-list :: terminalsList";
     }
 
     @GetMapping("/statuses")
     public String terminalStatuses(
-            @AuthenticationPrincipal AuthenticatedUser user,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
         int offset = (page - 1) * size;
-        List<TerminalSummary> terminals = terminalMapper.findStatusesByUserId(user.getUserId(), size, offset);
+        List<TerminalSummary> terminals = terminalMapper.findAllStatuses(size, offset);
         model.addAttribute("terminals", terminals);
         return "fragments/terminal-status :: oob-updates";
     }
@@ -70,7 +63,6 @@ public class TerminalsController {
 
     @PostMapping
     public String createTerminal(
-            @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @ModelAttribute("createTerminalRequest") CreateTerminalRequest request,
             BindingResult bindingResult,
             Model model) {
@@ -79,7 +71,7 @@ public class TerminalsController {
             return "fragments/terminal-create-modal :: terminalCreateForm";
         }
 
-        Result<Terminal> result = terminalService.createTerminal(user.getUserId(), request);
+        Result<Terminal> result = terminalService.createTerminal(request);
         if (result.isSuccess()) {
             model.addAttribute("terminal", result.getValue());
             return "fragments/terminal-create-modal :: terminalTokenView";
@@ -90,10 +82,10 @@ public class TerminalsController {
         }
     }
 
-    private void populateTerminalsModel(AuthenticatedUser user, int page, int size, Model model) {
+    private void populateTerminalsModel(int page, int size, Model model) {
         int offset = (page - 1) * size;
-        List<TerminalSummary> terminals = terminalMapper.findTerminalsByUserId(user.getUserId(), size, offset);
-        long totalTerminals = terminalMapper.countTerminalsByUserId(user.getUserId());
+        List<TerminalSummary> terminals = terminalMapper.findAllTerminals(size, offset);
+        long totalTerminals = terminalMapper.countAllTerminals();
         int totalPages = (int) Math.ceil((double) totalTerminals / size);
 
         model.addAttribute("terminals", terminals);

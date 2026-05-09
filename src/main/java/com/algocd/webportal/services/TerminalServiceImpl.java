@@ -38,7 +38,7 @@ public class TerminalServiceImpl implements TerminalService {
 
     @Override
     @Transactional
-    public Result<Terminal> createTerminal(UUID userId, CreateTerminalRequest request) {
+    public Result<Terminal> createTerminal(CreateTerminalRequest request) {
         Set<ConstraintViolation<CreateTerminalRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             return Result.failure(new AlgocdException(ErrorReason.VALIDATION_FAILED, "Validation failed: " + violations.iterator().next().getMessage()));
@@ -51,7 +51,6 @@ public class TerminalServiceImpl implements TerminalService {
 
         Terminal terminal = new Terminal(
                 terminalId,
-                userId,
                 TerminalStatus.DISCONNECTED,
                 null,
                 token,

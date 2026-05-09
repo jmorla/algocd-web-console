@@ -51,16 +51,15 @@ class TerminalServiceImplTest {
     @DisplayName("When createTerminal is called, then terminal and tags (name, platform) are inserted")
     void whenCreateTerminal_thenInsertsTerminalAndTags() {
         // Given
-        UUID userId = UUID.randomUUID();
         CreateTerminalRequest request = new CreateTerminalRequest("My Terminal", Platform.METATRADER_5, Map.of("key1", "value1"));
 
         // When
-        Result<Terminal> result = terminalService.createTerminal(userId, request);
+        Result<Terminal> result = terminalService.createTerminal(request);
 
         // Then
         assertThat(result.isSuccess()).isTrue();
         Terminal terminal = result.getValue();
-        assertThat(terminal.getUserId()).isEqualTo(userId);
+        assertThat(terminal.getTerminalId()).isNotNull();
 
         verify(terminalMapper).insert(any(Terminal.class));
 
