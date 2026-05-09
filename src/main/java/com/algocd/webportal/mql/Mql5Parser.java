@@ -12,6 +12,10 @@ public class Mql5Parser implements Parser {
         this.lexer = lexer;
     }
 
+    public Mql5Parser(String content) {
+        this.lexer = new MqlScanner(new MqlTokenizer(content.toCharArray()));
+    }
+
     @Override
     public Statement[] parse() {
         List<Statement> statements = new ArrayList<>();
@@ -31,7 +35,9 @@ public class Mql5Parser implements Parser {
             } else if (token.kind == Token.TokenKind.INPUT || token.kind == Token.TokenKind.EXTERN) {
                 statements.add(parseVariableDeclaration());
             } else {
-                throw new SyntaxException("Unexpected token: " + token.kind, token.start);
+                // For metadata extraction, we skip top-level tokens we don't recognize
+                // like function definitions, class keywords, etc.
+                lexer.nextToken();
             }
         }
         return statements.toArray(new Statement[0]);
@@ -40,8 +46,24 @@ public class Mql5Parser implements Parser {
     private PropertyStatement parseProperty() {
         Token propToken = match(Token.TokenKind.PROPERTY);
         Token idToken = match(Token.TokenKind.IDENTIFIER);
-        Expression value = parseExpression();
-        return new PropertyStatement(((Token.IdentifierToken) idToken).name, value);
+        
+        // Peek to see if there is an expression following
+        Result<Token, SyntaxError> peekRes = lexer.getToken();
+        if (peekRes.isSuccess()) {
+            Token peek = peekRes.getValue();
+            // In MQL5 properties, the value follows the identifier on the same line.
+            // If we hit EOF, or another property/modifier, then this property has no value.
+            if (peek.kind != Token.TokenKind.EOF && 
+                peek.kind != Token.TokenKind.PROPERTY && 
+                peek.kind != Token.TokenKind.INPUT && 
+                peek.kind != Token.TokenKind.EXTERN &&
+                peek.kind != Token.TokenKind.SEMICOLON) {
+                Expression value = parseExpression();
+                return new PropertyStatement(((Token.IdentifierToken) idToken).name, value);
+            }
+        }
+        
+        return new PropertyStatement(((Token.IdentifierToken) idToken).name, null);
     }
 
     private VariableDeclaration parseVariableDeclaration() {

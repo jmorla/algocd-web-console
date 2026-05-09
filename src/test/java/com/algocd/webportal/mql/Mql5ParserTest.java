@@ -3,6 +3,8 @@ package com.algocd.webportal.mql;
 import com.algocd.webportal.mql.tree.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class Mql5ParserTest {
@@ -71,5 +73,44 @@ class Mql5ParserTest {
 
         SyntaxException ex = assertThrows(SyntaxException.class, parser::parse);
         assertTrue(ex.getMessage().contains("Expected expression"));
+    }
+
+    @Test
+    void testParseComplexMql5File() {
+        String code = """
+            //+------------------------------------------------------------------+
+            //|                                                         test.mq5 |
+            //|                                  Copyright 2026, MetaQuotes Ltd. |
+            //|                                             https://www.mql5.com |
+            //+------------------------------------------------------------------+
+            #property library
+            #property copyright "Copyright 2026, MetaQuotes Ltd."
+            #property link      "https://www.mql5.com"
+            #property version   "1.00"
+            input int variable = 10;
+            //+------------------------------------------------------------------+
+            //| My function                                                      |
+            //+------------------------------------------------------------------+
+            int MyCalculator(int value,int value2) export
+               {
+                return(value+value2);
+               }
+            //+------------------------------------------------------------------+
+            """;
+        Mql5Parser parser = new Mql5Parser(code);
+        Statement[] statements = parser.parse();
+
+        // Verify we captured the properties and inputs
+        assertTrue(statements.length >= 5, "Should have parsed at least the 4 properties and 1 input");
+        
+        long propertiesCount = Arrays.stream(statements)
+                .filter(s -> s instanceof PropertyStatement)
+                .count();
+        assertEquals(4, propertiesCount);
+
+        long inputsCount = Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration)
+                .count();
+        assertEquals(1, inputsCount);
     }
 }
