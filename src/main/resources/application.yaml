@@ -8,6 +8,12 @@ spring:
     virtual:
       enabled: true
 
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
   thymeleaf:
     cache: false
   web:

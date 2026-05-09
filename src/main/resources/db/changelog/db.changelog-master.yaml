@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/20260505100000-initial-schema.yaml
+  - include:
+      file: db/changelog/20260508203000-artifact-processing-queue.yaml
