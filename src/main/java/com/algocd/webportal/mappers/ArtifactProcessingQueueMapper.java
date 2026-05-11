@@ -1,11 +1,9 @@
 package com.algocd.webportal.mappers;
 
 import com.algocd.webportal.entities.ArtifactProcessingQueue;
-import com.algocd.webportal.entities.ProcessingStatus;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Mapper
 public interface ArtifactProcessingQueueMapper {
@@ -30,17 +28,10 @@ public interface ArtifactProcessingQueueMapper {
     @Select("""
         SELECT id, user_id, file_path, original_filename, status, message, digest, created_at, updated_at
         FROM artifacts_processing_queue
-        WHERE id = #{id}
-        """)
-    Optional<ArtifactProcessingQueue> findById(Long id);
-
-    @Select("""
-        SELECT id, user_id, file_path, original_filename, status, message, digest, created_at, updated_at
-        FROM artifacts_processing_queue
-        WHERE status = #{status}
+        WHERE user_id = #{userId, jdbcType=OTHER}
         ORDER BY created_at ASC
         """)
-    List<ArtifactProcessingQueue> findByStatus(ProcessingStatus status);
+    org.apache.ibatis.cursor.Cursor<ArtifactProcessingQueue> findByUserIdCursor(@Param("userId") UUID userId);
 
     @Update("""
         UPDATE artifacts_processing_queue
@@ -51,7 +42,7 @@ public interface ArtifactProcessingQueueMapper {
         """)
     void updateStatus(
             @Param("id") Long id,
-            @Param("status") ProcessingStatus status,
+            @Param("status") com.algocd.webportal.entities.ProcessingStatus status,
             @Param("message") String message,
             @Param("updatedAt") java.time.Instant updatedAt
     );
