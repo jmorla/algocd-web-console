@@ -21,6 +21,8 @@ public class MqlTokenizer extends BaseReader {
     static {
         keywords.put("input", TokenKind.INPUT);
         keywords.put("extern", TokenKind.EXTERN);
+        keywords.put("group", TokenKind.GROUP);
+        keywords.put("static", TokenKind.STATIC);
         keywords.put("bool", TokenKind.BOOL);
         keywords.put("char", TokenKind.CHAR);
         keywords.put("uchar", TokenKind.UCHAR);
@@ -67,15 +69,27 @@ public class MqlTokenizer extends BaseReader {
                             state = State.IN_PROPERTY;
                             return Result.ok(new Token(TokenKind.PROPERTY, start, position));
                         }
+                    } else if ((cp == 'D' || cp == 'd') && peek() == '\'') {
+                        String val = readDateTime();
+                        return Result.ok(new Token.DateTimeLiteralToken(start, position, val));
                     } else if (Character.isJavaIdentifierStart(cp)) {
                         String id = readIdentifier();
-                        if ("input".equals(id)) {
+                        TokenKind k = keywords.get(id);
+                        if (k == TokenKind.INPUT || k == TokenKind.EXTERN) {
                             state = State.IN_INPUT;
-                            return Result.ok(new Token(TokenKind.INPUT, start, position));
-                        } else if ("extern".equals(id)) {
-                            state = State.IN_INPUT;
-                            return Result.ok(new Token(TokenKind.EXTERN, start, position));
+                            return Result.ok(new Token(k, start, position));
+                        } else if (k != null) {
+                            return Result.ok(new Token(k, start, position));
                         }
+                        return Result.ok(new Token.IdentifierToken(start, position, id));
+                    } else if (cp == '"') {
+                        Result<String, SyntaxError> res = readString();
+                        if (!res.isSuccess()) return Result.fail(res.getError());
+                        return Result.ok(new Token.StringLiteralToken(start, position, res.getValue()));
+                    } else if (Character.isDigit(cp)) {
+                        Result<String, SyntaxError> res = readNumber();
+                        if (!res.isSuccess()) return Result.fail(res.getError());
+                        return Result.ok(new Token.NumberLiteralToken(start, position, res.getValue()));
                     } else {
                         nextCodePoint();
                     }
@@ -88,6 +102,10 @@ public class MqlTokenizer extends BaseReader {
                     if (Character.isJavaIdentifierStart(cp)) {
                         String id = readIdentifier();
                         return Result.ok(new Token.IdentifierToken(start, position, id));
+                    }
+                    if ((cp == 'D' || cp == 'd') && peek() == '\'') {
+                        String val = readDateTime();
+                        return Result.ok(new Token.DateTimeLiteralToken(start, position, val));
                     }
                     if (Character.isDigit(cp)) {
                         Result<String, SyntaxError> res = readNumber();
@@ -111,12 +129,19 @@ public class MqlTokenizer extends BaseReader {
                         String id = readIdentifier();
                         TokenKind k = keywords.get(id);
                         if (k != null) {
+                            if (k == TokenKind.GROUP) {
+                                state = State.SEEKING; // input group doesn't end with ;
+                            }
                             return Result.ok(new Token(k, start, position));
                         }
                         if ("true".equals(id) || "false".equals(id)) {
                             return Result.ok(new Token.BooleanLiteralToken(start, position, "true".equals(id)));
                         }
                         return Result.ok(new Token.IdentifierToken(start, position, id));
+                    }
+                    if ((cp == 'D' || cp == 'd') && peek() == '\'') {
+                        String val = readDateTime();
+                        return Result.ok(new Token.DateTimeLiteralToken(start, position, val));
                     }
                     if (Character.isDigit(cp)) {
                         Result<String, SyntaxError> res = readNumber();
@@ -182,6 +207,23 @@ public class MqlTokenizer extends BaseReader {
             nextCodePoint();
         }
         while (Character.isJavaIdentifierPart(codepoint)) {
+            sb.append((char) codepoint);
+            nextCodePoint();
+        }
+        return sb.toString();
+    }
+
+    private String readDateTime() {
+        StringBuilder sb = new StringBuilder();
+        sb.append((char) codepoint);
+        nextCodePoint(); // D or d
+        sb.append((char) codepoint);
+        nextCodePoint(); // '
+        while (codepoint != '\'' && codepoint != EOF) {
+            sb.append((char) codepoint);
+            nextCodePoint();
+        }
+        if (codepoint == '\'') {
             sb.append((char) codepoint);
             nextCodePoint();
         }

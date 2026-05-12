@@ -70,6 +70,20 @@ public class Token {
         }
     }
 
+    public static class DateTimeLiteralToken extends Token {
+        public final String value;
+
+        public DateTimeLiteralToken(int start, int end, String value) {
+            super(TokenKind.DATETIME_LITERAL, start, end);
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("DateTimeLiteralToken[%d-%d, value='%s']", start, end, value);
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("Token[%s, %d-%d]", kind, start, end);
@@ -80,6 +94,8 @@ public class Token {
         PROPERTY("#property"),
         INPUT("input"),
         EXTERN("extern"),
+        GROUP("group"),
+        STATIC("static"),
         
         // Data Types Keywords
         BOOL("bool"), 
@@ -103,6 +119,7 @@ public class Token {
         STRING_LITERAL("string"),
         NUMBER_LITERAL("number"),
         BOOLEAN_LITERAL("boolean"),
+        DATETIME_LITERAL("datetime_literal"),
         
         // Punctuation
         ASSIGN("="),

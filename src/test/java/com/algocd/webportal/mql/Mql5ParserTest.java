@@ -3,11 +3,82 @@ package com.algocd.webportal.mql;
 import com.algocd.webportal.mql.tree.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class Mql5ParserTest {
+
+    @Test
+    void testParseScript1() throws IOException {
+        Path path = Path.of("src/test/resources/ea.mq5");
+        String code = Files.readString(path, StandardCharsets.UTF_8);
+        Mql5Parser parser = new Mql5Parser(code);
+        Statement[] statements = parser.parse();
+
+        assertNotNull(statements);
+        // script_1.mq5 has:
+        // 3 properties: copyright, link, version
+        // 1 input group (skipped)
+        // 8 input/static input variables: TradeComment, EA_Magic, LotSize, RSI_Period, RSI_Level, Stop_Loss, Take_Profit, Close_Signal
+        // Total should be 3 + 8 = 11
+        
+        long propertiesCount = Arrays.stream(statements)
+                .filter(s -> s instanceof PropertyStatement)
+                .count();
+        assertEquals(3, propertiesCount);
+
+        long inputsCount = Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration)
+                .count();
+        assertEquals(8, inputsCount);
+        
+        // Verify some specific values
+        VariableDeclaration lotSize = (VariableDeclaration) Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration && ((VariableDeclaration) s).name().equals("LotSize"))
+                .findFirst().orElseThrow();
+        assertEquals(Token.TokenKind.DOUBLE, lotSize.type());
+        assertEquals("0.01", ((Literal.NumberLiteral) lotSize.value()).value());
+    }
+
+    @Test
+    void testParseScript2() throws IOException {
+        Path path = Path.of("src/test/resources/ea2.mq5");
+        String code = Files.readString(path, StandardCharsets.UTF_8);
+        Mql5Parser parser = new Mql5Parser(code);
+        Statement[] statements = parser.parse();
+
+        assertNotNull(statements);
+        
+        long propertiesCount = Arrays.stream(statements)
+                .filter(s -> s instanceof PropertyStatement)
+                .count();
+        // copyright, link, strict, and 41 tester_indicator properties
+        assertTrue(propertiesCount >= 44);
+
+        long inputsCount = Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration)
+                .count();
+        // Many inputs in this file
+        assertTrue(inputsCount > 20);
+        
+        // Verify some specific values
+        VariableDeclaration magicNumber = (VariableDeclaration) Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration && ((VariableDeclaration) s).name().equals("MagicNumber"))
+                .findFirst().orElseThrow();
+        assertEquals(Token.TokenKind.INT, magicNumber.type());
+        assertEquals("11111", ((Literal.NumberLiteral) magicNumber.value()).value());
+
+        VariableDeclaration customComment = (VariableDeclaration) Arrays.stream(statements)
+                .filter(s -> s instanceof VariableDeclaration && ((VariableDeclaration) s).name().equals("CustomComment"))
+                .findFirst().orElseThrow();
+        assertEquals(Token.TokenKind.STRING, customComment.type());
+        assertEquals("NEXOR_BTCUSD_Strategy_2_22_100", ((Literal.StringLiteral) customComment.value()).value());
+    }
 
     @Test
     void testParseProperty() {

@@ -2,8 +2,10 @@ package com.algocd.webportal.entities;
 
 public enum ProcessingStatus {
     QUEUED,
-    ANALIZING,
+    ANALYZING,
+    ANALYZED,
     COMPILING,
+    COMPILED,
     UPLOADING,
     COMPLETED,
     FAILED

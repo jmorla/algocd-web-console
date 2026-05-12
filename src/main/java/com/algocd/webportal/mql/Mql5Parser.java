@@ -32,8 +32,11 @@ public class Mql5Parser implements Parser {
 
             if (token.kind == Token.TokenKind.PROPERTY) {
                 statements.add(parseProperty());
-            } else if (token.kind == Token.TokenKind.INPUT || token.kind == Token.TokenKind.EXTERN) {
-                statements.add(parseVariableDeclaration());
+            } else if (token.kind == Token.TokenKind.INPUT || token.kind == Token.TokenKind.EXTERN || token.kind == Token.TokenKind.STATIC) {
+                Statement stmt = parseVariableDeclaration();
+                if (stmt != null) {
+                    statements.add(stmt);
+                }
             } else {
                 // For metadata extraction, we skip top-level tokens we don't recognize
                 // like function definitions, class keywords, etc.
@@ -44,7 +47,7 @@ public class Mql5Parser implements Parser {
     }
 
     private PropertyStatement parseProperty() {
-        Token propToken = match(Token.TokenKind.PROPERTY);
+        match(Token.TokenKind.PROPERTY);
         Token idToken = match(Token.TokenKind.IDENTIFIER);
         
         // Peek to see if there is an expression following
@@ -52,11 +55,11 @@ public class Mql5Parser implements Parser {
         if (peekRes.isSuccess()) {
             Token peek = peekRes.getValue();
             // In MQL5 properties, the value follows the identifier on the same line.
-            // If we hit EOF, or another property/modifier, then this property has no value.
             if (peek.kind != Token.TokenKind.EOF && 
                 peek.kind != Token.TokenKind.PROPERTY && 
                 peek.kind != Token.TokenKind.INPUT && 
                 peek.kind != Token.TokenKind.EXTERN &&
+                peek.kind != Token.TokenKind.STATIC &&
                 peek.kind != Token.TokenKind.SEMICOLON) {
                 Expression value = parseExpression();
                 return new PropertyStatement(((Token.IdentifierToken) idToken).name, value);
@@ -67,16 +70,31 @@ public class Mql5Parser implements Parser {
     }
 
     private VariableDeclaration parseVariableDeclaration() {
-        Result<Token, SyntaxError> modRes = lexer.getToken();
-        if (!modRes.isSuccess()) throw new SyntaxException(modRes.getError().message, modRes.getError().position);
-        Token modifierToken = modRes.getValue();
+        Token first = lexer.getToken().getValue();
+        if (first.kind == Token.TokenKind.STATIC) {
+            lexer.nextToken();
+        }
+
+        Token modifierToken = lexer.getToken().getValue();
+        if (modifierToken.kind != Token.TokenKind.INPUT && modifierToken.kind != Token.TokenKind.EXTERN) {
+             // If it was just 'static' without input/extern, we skip it for now (could be a global var)
+             return null;
+        }
+        
         VariableDeclaration.Modifier modifier = modifierToken.kind == Token.TokenKind.INPUT ? 
                 VariableDeclaration.Modifier.INPUT : VariableDeclaration.Modifier.EXTERN;
         lexer.nextToken();
 
-        Result<Token, SyntaxError> typeRes = lexer.getToken();
-        if (!typeRes.isSuccess()) throw new SyntaxException(typeRes.getError().message, typeRes.getError().position);
-        Token typeToken = typeRes.getValue();
+        // Check for 'group'
+        Token next = lexer.getToken().getValue();
+        if (next.kind == Token.TokenKind.GROUP) {
+            lexer.nextToken(); // group
+            lexer.nextToken(); // "label"
+            // input group doesn't have a semicolon
+            return null;
+        }
+
+        Token typeToken = lexer.getToken().getValue();
         lexer.nextToken();
 
         Token nameToken = match(Token.TokenKind.IDENTIFIER);
@@ -90,7 +108,10 @@ public class Mql5Parser implements Parser {
             value = parseExpression();
         }
 
-        match(Token.TokenKind.SEMICOLON);
+        // Variable declarations should end with semicolon, but some might have comments
+        if (lexer.getToken().getValue().kind == Token.TokenKind.SEMICOLON) {
+            lexer.nextToken();
+        }
 
         return new VariableDeclaration(modifier, typeToken.kind, ((Token.IdentifierToken) nameToken).name, value);
     }
@@ -110,6 +131,7 @@ public class Mql5Parser implements Parser {
             case Token.StringLiteralToken str -> new Literal.StringLiteral(str.value);
             case Token.NumberLiteralToken num -> new Literal.NumberLiteral(num.value);
             case Token.BooleanLiteralToken bool -> new Literal.BooleanLiteral(bool.value);
+            case Token.DateTimeLiteralToken dt -> new Literal.DateTimeLiteral(dt.value);
             case Token.IdentifierToken id -> new Identifier(id.name);
             default -> throw new SyntaxException("Expected expression, found: " + token.kind, token.start);
         };

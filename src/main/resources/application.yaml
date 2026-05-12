@@ -61,4 +61,8 @@ algocd:
       ttl: 30s
   storage:
     upload-dir: ${STORAGE_UPLOAD_DIR:/tmp/algocd-uploads}
+  artifact:
+    pipeline:
+      max-concurrent-per-user: ${ARTIFACT_PIPELINE_MAX_CONCURRENT:5}
+      compiler-path: ${ARTIFACT_PIPELINE_COMPILER_PATH:/home/jmorla/Workspace/Algocd/compile_mq5.sh}
 

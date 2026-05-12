@@ -2,13 +2,12 @@ package com.algocd.webportal.services;
 
 import com.algocd.webportal.entities.ArtifactProcessingQueue;
 import com.algocd.webportal.entities.ProcessingStatus;
-import com.algocd.webportal.events.ArtifactUploadedEvent;
 import com.algocd.webportal.mappers.ArtifactProcessingQueueMapper;
+import com.algocd.webportal.services.pipeline.ArtifactPipelineGateway;
 import com.algocd.webportal.util.DigestUtil;
 import com.algocd.webportal.util.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,12 +22,12 @@ public class ArtifactServiceImpl implements ArtifactService {
 
     private final StorageService storageService;
     private final ArtifactProcessingQueueMapper queueMapper;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ArtifactPipelineGateway gateway;
 
-    public ArtifactServiceImpl(StorageService storageService, ArtifactProcessingQueueMapper queueMapper, ApplicationEventPublisher eventPublisher) {
+    public ArtifactServiceImpl(StorageService storageService, ArtifactProcessingQueueMapper queueMapper, ArtifactPipelineGateway gateway) {
         this.storageService = storageService;
         this.queueMapper = queueMapper;
-        this.eventPublisher = eventPublisher;
+        this.gateway = gateway;
     }
 
     @Override
@@ -37,8 +36,6 @@ public class ArtifactServiceImpl implements ArtifactService {
             return Result.success(null);
         }
 
-        boolean processedAny = false;
-        int successCount = 0;
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
                 continue;
@@ -77,15 +74,10 @@ public class ArtifactServiceImpl implements ArtifactService {
 
             try {
                 queueMapper.insert(record);
-                processedAny = true;
-                successCount++;
+                gateway.queueForAnalysis(record);
             } catch (Exception e) {
                 logger.error("Failed to insert queue record for file {}", file.getOriginalFilename(), e);
             }
-        }
-
-        if (processedAny) {
-            eventPublisher.publishEvent(new ArtifactUploadedEvent(userId, successCount));
         }
 
         return Result.success(null);

@@ -18,14 +18,19 @@ public class OrasConfig {
      */
     @Bean
     public Registry orasRegistry(OciRegistryProperties properties) {
+        Registry.Builder builder = Registry.builder();
+        
         if (properties.username() != null && !properties.username().isBlank() &&
                 properties.password() != null && !properties.password().isBlank()) {
-            return Registry.builder()
-                    .defaults(properties.username(), properties.password())
-                    .build();
+            builder.defaults(properties.username(), properties.password());
+        } else {
+            builder.defaults();
         }
-        return Registry.builder()
-                .defaults()
-                .build();
+
+        if (!properties.tlsEnabled()) {
+            builder.insecure();
+        }
+
+        return builder.build();
     }
 }
