@@ -10,7 +10,7 @@ public class TomcatCustomizerConfig implements WebServerFactoryCustomizer<Tomcat
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
         factory.addConnectorCustomizers(connector -> {
-            connector.setMaxFileCount(100);
+            connector.setMaxPartCount(-1);
         });
     }
 }

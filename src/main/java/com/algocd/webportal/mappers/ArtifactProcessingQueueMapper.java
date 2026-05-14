@@ -31,7 +31,7 @@ public interface ArtifactProcessingQueueMapper {
         SELECT id, user_id, batch_id, file_path, original_filename, status, message, digest, size_bytes, created_at, updated_at
         FROM artifacts_processing_queue
         WHERE user_id = #{userId, jdbcType=OTHER}
-        ORDER BY created_at ASC
+        ORDER BY updated_at DESC
         """)
     org.apache.ibatis.cursor.Cursor<ArtifactProcessingQueue> findByUserIdCursor(@Param("userId") UUID userId);
 
@@ -39,7 +39,7 @@ public interface ArtifactProcessingQueueMapper {
         SELECT id, user_id, batch_id, file_path, original_filename, status, message, digest, size_bytes, created_at, updated_at
         FROM artifacts_processing_queue
         WHERE batch_id = #{batchId, jdbcType=OTHER}
-        ORDER BY created_at ASC
+        ORDER BY updated_at DESC
         """)
     java.util.List<ArtifactProcessingQueue> findByBatchId(@Param("batchId") java.util.UUID batchId);
 
