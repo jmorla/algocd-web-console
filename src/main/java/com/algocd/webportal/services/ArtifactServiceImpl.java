@@ -31,10 +31,12 @@ public class ArtifactServiceImpl implements ArtifactService {
     }
 
     @Override
-    public Result<Void> processAndQueueArtifacts(MultipartFile[] files, UUID userId) {
+    public Result<UUID> processAndQueueArtifacts(MultipartFile[] files, UUID userId) {
         if (files == null) {
             return Result.success(null);
         }
+
+        UUID batchId = UUID.randomUUID();
 
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
@@ -43,7 +45,9 @@ public class ArtifactServiceImpl implements ArtifactService {
 
             ArtifactProcessingQueue record = new ArtifactProcessingQueue();
             record.setUserId(userId);
+            record.setBatchId(batchId);
             record.setOriginalFilename(file.getOriginalFilename());
+            record.setSizeBytes(file.getSize());
             record.setCreatedAt(Instant.now());
             record.setUpdatedAt(Instant.now());
 
@@ -80,6 +84,11 @@ public class ArtifactServiceImpl implements ArtifactService {
             }
         }
 
-        return Result.success(null);
+        return Result.success(batchId);
+    }
+
+    @Override
+    public java.util.List<ArtifactProcessingQueue> getQueueStatus(UUID batchId) {
+        return queueMapper.findByBatchId(batchId);
     }
 }

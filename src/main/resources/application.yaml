@@ -1,9 +1,16 @@
 server:
   port: ${SERVER_PORT:8080}
+  tomcat:
+    max-swallow-size: -1
+    max-http-form-post-size: 100MB
 
 spring:
   application:
     name: webportal
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   threads:
     virtual:
       enabled: true

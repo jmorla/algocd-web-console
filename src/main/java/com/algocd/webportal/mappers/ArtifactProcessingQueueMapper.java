@@ -10,14 +10,16 @@ public interface ArtifactProcessingQueueMapper {
 
     @Insert("""
         INSERT INTO artifacts_processing_queue (
-            user_id, file_path, original_filename, status, message, digest, created_at, updated_at
+            user_id, batch_id, file_path, original_filename, status, message, digest, size_bytes, created_at, updated_at
         ) VALUES (
             #{userId, jdbcType=OTHER},
+            #{batchId, jdbcType=OTHER},
             #{filePath},
             #{originalFilename},
             #{status},
             #{message},
             #{digest},
+            #{sizeBytes},
             #{createdAt},
             #{updatedAt}
         )
@@ -26,12 +28,20 @@ public interface ArtifactProcessingQueueMapper {
     void insert(ArtifactProcessingQueue record);
 
     @Select("""
-        SELECT id, user_id, file_path, original_filename, status, message, digest, created_at, updated_at
+        SELECT id, user_id, batch_id, file_path, original_filename, status, message, digest, size_bytes, created_at, updated_at
         FROM artifacts_processing_queue
         WHERE user_id = #{userId, jdbcType=OTHER}
         ORDER BY created_at ASC
         """)
     org.apache.ibatis.cursor.Cursor<ArtifactProcessingQueue> findByUserIdCursor(@Param("userId") UUID userId);
+
+    @Select("""
+        SELECT id, user_id, batch_id, file_path, original_filename, status, message, digest, size_bytes, created_at, updated_at
+        FROM artifacts_processing_queue
+        WHERE batch_id = #{batchId, jdbcType=OTHER}
+        ORDER BY created_at ASC
+        """)
+    java.util.List<ArtifactProcessingQueue> findByBatchId(@Param("batchId") java.util.UUID batchId);
 
     @Update("""
         UPDATE artifacts_processing_queue

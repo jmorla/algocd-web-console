@@ -94,7 +94,7 @@ public class UploadServiceActivator {
             String username = user.getUsername();
 
             // Construct ContainerRef using artifactId for OCI compliance
-            // Path: <host>:<port>/algocd/<username>/<kind>s/<artifactId>:<version>
+            // Path: <host>:<port>/algocd/<username>/<kind>/<artifactId>:<version>
             String repoPath = String.format("algocd/%s/%ss/%s", username, kind, artifactId);
             ContainerRef ref = ContainerRef.parse(registryProperties.getUrl() + "/" + repoPath + ":" + version);
 

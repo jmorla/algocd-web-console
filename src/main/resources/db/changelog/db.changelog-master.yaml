@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/changelog/20260505100000-initial-schema.yaml
   - include:
       file: db/changelog/20260508203000-artifact-processing-queue.yaml
+  - include:
+      file: db/changelog/20260513100000-add-batch-id-to-processing-queue.yaml
+  - include:
+      file: db/changelog/20260513110000-add-size-bytes-to-processing-queue.yaml

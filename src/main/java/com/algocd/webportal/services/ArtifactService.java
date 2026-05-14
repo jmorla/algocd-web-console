@@ -6,5 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 public interface ArtifactService {
-    Result<Void> processAndQueueArtifacts(MultipartFile[] files, UUID userId);
+    Result<UUID> processAndQueueArtifacts(MultipartFile[] files, UUID userId);
+    java.util.List<com.algocd.webportal.entities.ArtifactProcessingQueue> getQueueStatus(UUID batchId);
 }

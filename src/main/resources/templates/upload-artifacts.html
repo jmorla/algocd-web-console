@@ -54,7 +54,7 @@
                     this.selectedTags = this.selectedTags.filter(t => t.key !== key);
                 }
               }">
-            <form hx-post="/repository/upload" hx-encoding="multipart/form-data" class="space-y-8">
+            <form hx-post="/repository/upload" hx-encoding="multipart/form-data" hx-target="#file-list" hx-swap="outerHTML" class="space-y-8">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
               
               <!-- Tags Section -->
@@ -127,9 +127,7 @@
                 </div>
                 
                 <!-- File List (Hidden by default) -->
-                <div id="file-list" class="mt-4 space-y-2 max-h-[320px] overflow-y-auto pr-1 hidden custom-scrollbar">
-                  <!-- Files will be injected here -->
-                </div>
+                <div th:replace="~{fragments/upload-file-list :: uploadFileList}"></div>
               </div>
 
               <!-- Action Buttons & Summary -->
@@ -170,11 +168,13 @@
       const dropZone = document.getElementById('drop-zone');
       const dropZoneContainer = document.getElementById('drop-zone-container');
       const fileInput = document.getElementById('file-input');
-      const fileList = document.getElementById('file-list');
       const uploadSummary = document.getElementById('upload-summary');
       const totalFilesCount = document.getElementById('total-files-count');
       const totalFilesSize = document.getElementById('total-files-size');
       const resetBtn = document.getElementById('reset-upload');
+
+      const getFileList = () => document.getElementById('file-list');
+      const getFileListBody = () => document.getElementById('file-list-body');
 
       dropZone.addEventListener('click', () => fileInput.click());
 
@@ -183,9 +183,11 @@
       });
 
       resetBtn.addEventListener('click', () => {
+        const fileList = getFileList();
+        const fileListBody = getFileListBody();
         fileInput.value = '';
-        fileList.innerHTML = '';
-        fileList.classList.add('hidden');
+        if (fileListBody) fileListBody.innerHTML = '';
+        if (fileList) fileList.classList.add('hidden');
         uploadSummary.classList.add('hidden');
         dropZoneContainer.classList.remove('hidden');
       });
@@ -208,31 +210,47 @@
 
       function handleFiles(files) {
         if (files.length > 0) {
+          const fileList = getFileList();
+          const fileListBody = getFileListBody();
+          
           dropZoneContainer.classList.add('hidden');
-          fileList.classList.remove('hidden');
+          if (fileList) fileList.classList.remove('hidden');
           uploadSummary.classList.remove('hidden');
           
           let totalSize = 0;
           const countPattern = totalFilesCount.dataset.pattern || '{0} files';
           totalFilesCount.textContent = countPattern.replace('{0}', files.length);
           
-          fileList.innerHTML = Array.from(files).map(file => {
-            totalSize += file.size;
-            return `
-            <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
-              <div class="flex items-center gap-3">
-                <div class="p-2 bg-blue-50 rounded-lg">
-                  <i data-lucide="file-code" class="w-4 h-4 text-[#2563EB]"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-bold text-[#1E293B]">${file.name}</p>
-                  <p class="text-[11px] text-slate-500">${(file.size / 1024).toFixed(1)} KB</p>
-                </div>
-              </div>
-            </div>
-          `}).join('');
+          if (fileListBody) {
+            fileListBody.innerHTML = Array.from(files).map(file => {
+              totalSize += file.size;
+              const sizeStr = file.size < 1024 ? `${file.size} B` : (file.size < 1048576 ? `${(file.size / 1024).toFixed(1)} KB` : `${(file.size / 1048576).toFixed(1)} MB`);
+              return `
+              <tr class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-6 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+                      <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <span class="text-sm font-bold text-[#1E293B]">${file.name}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-3 text-right text-xs font-medium text-slate-500">
+                  ${sizeStr}
+                </td>
+                <td class="px-6 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-wider">
+                    Pending
+                  </span>
+                </td>
+                <td class="px-6 py-3 text-right text-xs text-slate-400">
+                  Just now
+                </td>
+              </tr>
+            `}).join('');
+          }
           
-          totalFilesSize.textContent = `${(totalSize / 1024).toFixed(1)} KB`;
+          totalFilesSize.textContent = totalSize < 1024 ? `${totalSize} B` : (totalSize < 1048576 ? `${(totalSize / 1024).toFixed(1)} KB` : `${(totalSize / 1048576).toFixed(1)} MB`);
           
           // Re-initialize icons for the new elements
           if (window.lucide) {

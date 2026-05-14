@@ -15,6 +15,9 @@ public class ArtifactProcessingQueue {
     @NotNull
     private UUID userId;
 
+    @NotNull
+    private UUID batchId;
+
     @NotBlank
     @Size(max = 1024)
     private String filePath;
@@ -31,6 +34,8 @@ public class ArtifactProcessingQueue {
     @Size(max = 255)
     private String digest;
 
+    private Long sizeBytes;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -38,14 +43,16 @@ public class ArtifactProcessingQueue {
     public ArtifactProcessingQueue() {
     }
 
-    public ArtifactProcessingQueue(Long id, UUID userId, String filePath, String originalFilename, ProcessingStatus status, String message, String digest, Instant createdAt, Instant updatedAt) {
+    public ArtifactProcessingQueue(Long id, UUID userId, UUID batchId, String filePath, String originalFilename, ProcessingStatus status, String message, String digest, Long sizeBytes, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.userId = userId;
+        this.batchId = batchId;
         this.filePath = filePath;
         this.originalFilename = originalFilename;
         this.status = status;
         this.message = message;
         this.digest = digest;
+        this.sizeBytes = sizeBytes;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -64,6 +71,14 @@ public class ArtifactProcessingQueue {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public UUID getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(UUID batchId) {
+        this.batchId = batchId;
     }
 
     public String getFilePath() {
@@ -106,6 +121,14 @@ public class ArtifactProcessingQueue {
         this.digest = digest;
     }
 
+    public Long getSizeBytes() {
+        return sizeBytes;
+    }
+
+    public void setSizeBytes(Long sizeBytes) {
+        this.sizeBytes = sizeBytes;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -127,12 +150,12 @@ public class ArtifactProcessingQueue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArtifactProcessingQueue that = (ArtifactProcessingQueue) o;
-        return Objects.equals(id, that.id) && Objects.equals(userId, that.userId) && Objects.equals(filePath, that.filePath) && Objects.equals(originalFilename, that.originalFilename) && Objects.equals(status, that.status) && Objects.equals(message, that.message) && Objects.equals(digest, that.digest) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return Objects.equals(id, that.id) && Objects.equals(userId, that.userId) && Objects.equals(batchId, that.batchId) && Objects.equals(filePath, that.filePath) && Objects.equals(originalFilename, that.originalFilename) && Objects.equals(status, that.status) && Objects.equals(message, that.message) && Objects.equals(digest, that.digest) && Objects.equals(sizeBytes, that.sizeBytes) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, filePath, originalFilename, status, message, digest, createdAt, updatedAt);
+        return Objects.hash(id, userId, batchId, filePath, originalFilename, status, message, digest, sizeBytes, createdAt, updatedAt);
     }
 
     @Override
@@ -140,11 +163,13 @@ public class ArtifactProcessingQueue {
         return "ArtifactProcessingQueue{" +
                 "id=" + id +
                 ", userId=" + userId +
+                ", batchId=" + batchId +
                 ", filePath='" + filePath + '\'' +
                 ", originalFilename='" + originalFilename + '\'' +
                 ", status=" + status +
                 ", message='" + message + '\'' +
                 ", digest='" + digest + '\'' +
+                ", sizeBytes=" + sizeBytes +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

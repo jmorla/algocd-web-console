@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260513100000-1
+      author: gemini
+      changes:
+        - addColumn:
+            tableName: artifacts_processing_queue
+            columns:
+              - column:
+                  name: batch_id
+                  type: uuid
+                  constraints:
+                    nullable: false

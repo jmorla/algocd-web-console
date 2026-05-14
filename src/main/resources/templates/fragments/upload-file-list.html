@@ -1,0 +1,96 @@
+<div th:fragment="uploadFileList" id="file-list" class="mt-4 max-h-[320px] overflow-y-auto custom-scrollbar border border-slate-200 rounded-2xl shadow-sm bg-white" 
+     xmlns:th="http://www.thymeleaf.org"
+     th:classappend="${queueFiles == null} ? 'hidden' : ''"
+     th:attr="hx-get=${isProcessing} ? '/repository/upload/status' : null, 
+             hx-trigger=${isProcessing} ? 'every 2s' : null,
+             hx-swap='outerHTML'">
+  <table class="w-full text-left border-collapse">
+    <thead class="sticky top-0 z-10 bg-slate-50 shadow-[0_1px_0_0_rgba(226,232,240,1)]">
+      <tr>
+        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider" th:text="#{repository.upload.status.column.name}">Name</th>
+        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.upload.status.column.size}">Size</th>
+        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center" th:text="#{repository.upload.status.column.status}">Status</th>
+        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right" th:text="#{repository.upload.status.column.created}">Created</th>
+      </tr>
+    </thead>
+    <tbody id="file-list-body" class="divide-y divide-slate-50">
+      <tr th:if="${isProcessing}" class="bg-blue-50/30">
+        <td colspan="4" class="px-6 py-2 text-center">
+          <div class="flex items-center justify-center gap-2 text-[11px] font-bold text-blue-600 uppercase tracking-widest">
+            <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>
+            <span th:text="#{repository.upload.status.processing_batch}">Processing Batch...</span>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${queueFiles == null and !isProcessing}" class="animate-pulse">
+        <td colspan="4" class="px-6 py-8 text-center text-sm text-slate-400" th:text="#{repository.upload.status.initialising}">
+          Initialising upload...
+        </td>
+      </tr>
+      <tr th:each="file : ${queueFiles}" 
+          class="hover:bg-slate-50/50 transition-colors"
+          th:classappend="${file.status != T(com.algocd.webportal.entities.ProcessingStatus).COMPLETED and file.status != T(com.algocd.webportal.entities.ProcessingStatus).FAILED} ? 'animate-pulse bg-slate-50/30' : ''">
+        <td class="px-6 py-3">
+          <div class="flex items-center gap-3">
+            <div class="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+              <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="text-sm font-bold text-[#1E293B]" th:text="${file.originalFilename}">filename.mq5</span>
+          </div>
+        </td>
+        <td class="px-6 py-3 text-right text-xs font-medium text-slate-500" 
+            th:text="${file.sizeBytes != null} ? (${file.sizeBytes < 1024 ? file.sizeBytes + ' B' : (file.sizeBytes < 1048576 ? (file.sizeBytes / 1024) + ' KB' : (file.sizeBytes / 1048576) + ' MB')}) : '-'">
+           12 KB
+        </td>
+        <td class="px-6 py-3 text-center">
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).QUEUED}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
+            <i data-lucide="clock" class="w-2.5 h-2.5"></i>
+            <span th:text="#{repository.upload.status.QUEUED}">Queued</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).ANALYZING}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider">
+            <i data-lucide="search" class="w-2.5 h-2.5 animate-bounce"></i>
+            <span th:text="#{repository.upload.status.ANALYZING}">Analyzing</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).ANALYZED}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
+            <i data-lucide="check-circle-2" class="w-2.5 h-2.5 text-indigo-400"></i>
+            <span th:text="#{repository.upload.status.ANALYZED}">Analyzed</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).COMPILING}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 uppercase tracking-wider">
+            <i data-lucide="cpu" class="w-2.5 h-2.5 animate-spin"></i>
+            <span th:text="#{repository.upload.status.COMPILING}">Compiling</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).COMPILED}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200 uppercase tracking-wider">
+            <i data-lucide="check-circle-2" class="w-2.5 h-2.5"></i>
+            <span th:text="#{repository.upload.status.COMPILED}">Compiled</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).UPLOADING}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-600 border border-cyan-100 uppercase tracking-wider">
+            <i data-lucide="upload-cloud" class="w-2.5 h-2.5 animate-bounce"></i>
+            <span th:text="#{repository.upload.status.UPLOADING}">Uploading</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).COMPLETED}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 uppercase tracking-wider">
+            <i data-lucide="check" class="w-2.5 h-2.5"></i>
+            <span th:text="#{repository.upload.status.COMPLETED}">Completed</span>
+          </span>
+          <span th:if="${file.status == T(com.algocd.webportal.entities.ProcessingStatus).FAILED}" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100 uppercase tracking-wider" 
+                th:title="${file.message != null and #messages.msgOrNull(file.message) != null ? #messages.msg(file.message) : file.message}">
+            <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
+            <span th:text="#{repository.upload.status.FAILED}">Failed</span>
+          </span>
+        </td>
+        <td class="px-6 py-3 text-right text-xs text-slate-400" th:text="${#temporals.format(file.createdAt, 'HH:mm:ss')}">
+          Just now
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <script th:if="${queueFiles != null}">
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  </script>
+  
+  <!-- Add data attributes for JavaScript i18n -->
+  <div id="i18n-data" class="hidden" 
+       th:data-pending="#{repository.upload.status.pending}"
+       th:data-just-now="#{repository.upload.status.just_now}"></div>
+</div>
